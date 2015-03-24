@@ -41,7 +41,6 @@ class MakoTemplateBlock(object):
         }
 
     def studio_view(self, context):
-        import pudb; pu.db
         return Fragment(
             self.system.render_template(self.mako_template, self.get_context())
         )
