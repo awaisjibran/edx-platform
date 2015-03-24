@@ -8,6 +8,13 @@
     from django.utils.translation import get_language_bidi
     dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
 %>
+
+<script type="text/javascript">
+  // For performance data
+  // Set start time before loading everything
+  loadStartTime = Date.now();
+</script>
+
 <head dir="${dir_rtl}">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -182,3 +189,27 @@
     )
   ) if course_id and enrollment_action else ""
 }</%def>
+
+# Performance beacon for onload times
+% if settings.FEATURES.get('ENABLE_ONLOAD_BEACON', False):
+<script>
+  sample_rate = ${settings.ONLOAD_BEACON_SAMPLE_RATE}
+  roll = Math.floor(Math.random() * 100)/100
+
+  if(roll < sample_rate){
+    onloadBeaconSent = false;
+    $(window).load(function() {
+      var data = {
+        event: "onload",
+        value: Date.now() - loadStartTime,
+        page: window.location.href,
+      };
+
+      if (!onloadBeaconSent) {
+        $.ajax({method: "POST", url: "/performance", data: data});
+      }
+      onloadBeaconSent = true;
+    });
+  }
+</script>
+% endif
