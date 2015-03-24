@@ -242,7 +242,18 @@ def shim_xmodule_js(fragment):
         fragment.initialize_js('XBlockToXModuleShim')
 
 
-class XModuleMixin(XBlockMixin):
+class XModuleFields(object):
+    display_name = String(
+        display_name="Display Name",
+        help="This name appears in the horizontal navigation at the top of the page.",
+        scope=Scope.settings,
+        # it'd be nice to have a useful default but it screws up other things; so,
+        # use display_name_with_default for those
+        default=None
+    )
+
+
+class XModuleMixin(XModuleFields, XBlockMixin):
     """
     Fields and methods used by XModules internally.
 
@@ -272,15 +283,6 @@ class XModuleMixin(XBlockMixin):
     # the function can also be overridden if the icon class depends on the data
     # in the module
     icon_class = 'other'
-
-    display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
-        scope=Scope.settings,
-        # it'd be nice to have a useful default but it screws up other things; so,
-        # use display_name_with_default for those
-        default=None
-    )
 
     def __init__(self, *args, **kwargs):
         self.xmodule_runtime = None

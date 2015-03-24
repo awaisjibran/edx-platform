@@ -5,8 +5,8 @@ import logging
 from lxml import etree
 from xblock.core import XBlock
 from xblock.fragment import Fragment
-from xmodule.x_module import STUDENT_VIEW
-from xmodule.seq_module import SequenceDescriptor
+from xmodule.x_module import STUDENT_VIEW, XModuleFields
+from xmodule.seq_module import SequenceFields
 from xmodule.xml_module import XmlParserMixin
 from xmodule.progress import Progress
 from xmodule.studio_editable import StudioEditableBlock
@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 CLASS_PRIORITY = ['video', 'problem']
 
 
-class VerticalBlock(StudioEditableBlock, XmlParserMixin, MakoTemplateBlock, XBlock):
+class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlock, XBlock):
     """
     Layout module for laying out submodules vertically.
     """
