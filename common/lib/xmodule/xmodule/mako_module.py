@@ -1,4 +1,4 @@
-from .x_module import XModuleDescriptor, DescriptorSystem
+from .x_module import XModuleDescriptor, DescriptorSystem, shim_xmodule_js
 from xblock.fragment import Fragment
 
 
@@ -41,9 +41,11 @@ class MakoTemplateBlock(object):
         }
 
     def studio_view(self, context):
-        return Fragment(
+        fragment = Fragment(
             self.system.render_template(self.mako_template, self.get_context())
         )
+        shim_xmodule_js(self, fragment)
+        return fragment
 
 
 class MakoModuleDescriptor(MakoTemplateBlock, XModuleDescriptor):

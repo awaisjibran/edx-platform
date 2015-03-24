@@ -58,13 +58,13 @@
         return Descriptor;
     }());
 
-    this.XBlockToXModuleShim = function (runtime, element) {
+    this.XBlockToXModuleShim = function (runtime, element, initArgs) {
         /*
          * Load a single module (either an edit module or a display module)
          * from the supplied element, which should have a data-type attribute
          * specifying the class to load
          */
-        var moduleType = $(element).data('type'),
+        var moduleType = initArgs['xmodule-type'] || $(element).data('type'),
             module;
 
         if (moduleType === 'None') {
