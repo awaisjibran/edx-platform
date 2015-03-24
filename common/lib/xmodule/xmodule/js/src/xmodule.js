@@ -64,8 +64,14 @@
          * from the supplied element, which should have a data-type attribute
          * specifying the class to load
          */
-        var moduleType = initArgs['xmodule-type'] || $(element).data('type'),
-            module;
+        var moduleType, module;
+
+        if (initArgs) {
+            moduleType = initArgs['xmodule-type'];
+        }
+        if (!moduleType) {
+            moduleType = $(element).data('type');
+        }
 
         if (moduleType === 'None') {
             return;
