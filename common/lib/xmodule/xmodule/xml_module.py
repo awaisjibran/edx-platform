@@ -6,10 +6,12 @@ import sys
 from lxml import etree
 
 from xblock.fields import Dict, Scope, ScopeIds
+from xblock.runtime import KvsFieldData
 from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.inheritance import own_metadata, InheritanceKeyValueStore
 from xmodule.modulestore import EdxJSONEncoder
-from xblock.runtime import KvsFieldData
+
+import dogstats_wrapper as dog_stats_api
 
 log = logging.getLogger(__name__)
 
@@ -201,6 +203,9 @@ class XmlDescriptor(XModuleDescriptor):
             definition_xml = copy.deepcopy(xml_object)
             filepath = ''
         else:
+            tags = [ "location:xmlparser_util_mixin_load_definition_filename" ]
+            dog_stats_api.increment('vscompat.deprecation', tags=tags)
+
             filepath = cls._format_filepath(xml_object.tag, filename)
 
             # VS[compat]
@@ -209,6 +214,9 @@ class XmlDescriptor(XModuleDescriptor):
             # again in the correct format.  This should go away once the CMS is
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
+                tags = [ "location:xmlparser_util_mixin_load_definition_backcompat" ]
+                dog_stats_api.increment('vscompat.deprecation', tags=tags)
+
                 candidates = cls.backcompat_paths(filepath)
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
@@ -244,6 +252,10 @@ class XmlDescriptor(XModuleDescriptor):
             attr = cls._translate(attr)
 
             if attr in cls.metadata_to_strip:
+                if attr in ('course', 'org', 'url_name', 'filename'):
+                    tags = [ "location:xmlparser_util_mixin_load_metadata" ]
+                    tags.append("metadata:{}".format(attr))
+                    dog_stats_api.increment('vscompat.deprecation', tags=tags)
                 # don't load these
                 continue
 
@@ -293,8 +305,10 @@ class XmlDescriptor(XModuleDescriptor):
             definition_xml = cls.load_file(filepath, system.resources_fs, def_id)
             system.parse_asides(definition_xml, def_id, usage_id, id_generator)
         else:
-            definition_xml = xml_object
             filepath = None
+            definition_xml = xml_object
+            tags = [ "location:xmlparser_util_mixin_parse_xml" ]
+            dog_stats_api.increment('vscompat.deprecation', tags=tags)
 
         definition, children = cls.load_definition(definition_xml, system, def_id, id_generator)  # note this removes metadata
 
