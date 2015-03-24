@@ -13,5 +13,4 @@ class WrapperBlock(VerticalBlock):
     ''' Layout block for laying out sub-blocks vertically w/o css delimiters'''
 
     has_children = True
-    #css = {'scss': [resource_string(__name__, 'css/wrapper/display.scss')]}
 

@@ -26,7 +26,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
     Layout module for laying out submodules vertically.
     """
     mako_template = 'widgets/sequence-edit.html'
-    js_module_name = "VerticalDescriptor"
+    js_module_name = "VerticalBlock"
 
     has_children = True
 
@@ -112,3 +112,8 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             self.fields['due'],
         ])
         return non_editable_fields
+
+    def studio_view(self, context):
+        fragment = super(VerticalBlock, self).studio_view(context)
+        fragment.add_javascript('VerticalBlock = XModule.Descriptor;')
+        return fragment
