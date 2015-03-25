@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta, datetime
+import ddt
 import json
 import requests.exceptions
 import pytz
@@ -7,6 +8,7 @@ import pytz
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.db.utils import IntegrityError
 from mock import patch
 from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=E0611
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -18,7 +20,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from verify_student.models import (
-    SoftwareSecurePhotoVerification, VerificationException,
+    SoftwareSecurePhotoVerification, VerificationException, VerificationCheckpoint
 )
 
 FAKE_SETTINGS = {
@@ -601,3 +603,50 @@ class TestMidcourseReverification(ModuleStoreTestCase):
         attempt.status = "approved"
         attempt.save()
         assert_true(SoftwareSecurePhotoVerification.user_has_valid_or_pending(user=self.user, window=window))
+
+# Lots of patching to stub in our own settings, S3 substitutes, and HTTP posting
+@patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
+@patch('verify_student.models.S3Connection', new=MockS3Connection)
+@patch('verify_student.models.Key', new=MockKey)
+@patch('verify_student.models.requests.post', new=mock_software_secure_post)
+@ddt.ddt
+class VerificationCheckpointTest(ModuleStoreTestCase):
+    """Tests for the ExampleCertificate model. """
+
+    def setUp(self):
+        super(VerificationCheckpointTest, self).setUp()
+        self.user = UserFactory.create()
+        self.course = CourseFactory.create()
+
+    @ddt.data('midterm', "final")
+    def test_get_verification_checkpoint(self, check_point):
+        ver_check_point = VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name=check_point)
+        assert_equals(ver_check_point.get_verification_checkpoint(self.course.id,check_point), ver_check_point)
+
+    def test_unique_together_constraint(self):
+        """
+        """
+        VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name="midterm")
+
+        with self.assertRaises(IntegrityError):
+            VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name="midterm")
+
+    def test_add_verification_attempt_software_secure(self):
+        """
+
+        """
+        check_point1 = VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name="midterm")
+        check_point2 = VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name="final")
+        # Make an attempt
+        check_point1.add_verification_attempt(SoftwareSecurePhotoVerification.objects.create(user=self.user))
+        self.assertEqual(len(check_point1.photo_verification.all()), 1)
+
+        check_point1.add_verification_attempt(SoftwareSecurePhotoVerification.objects.create(user=self.user))
+        self.assertEqual(len(check_point1.photo_verification.all()), 2)
+
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        check_point2.add_verification_attempt(attempt)
+        self.assertEqual(len(check_point2.photo_verification.all()), 1)
+
+        check_point2.photo_verification.remove(attempt)
+        self.assertEqual(len(check_point2.photo_verification.all()),0)
