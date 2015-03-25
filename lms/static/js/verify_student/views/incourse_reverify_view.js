@@ -60,7 +60,8 @@
         },
 
         submitPhoto: function() {
-            // TODO: disable the submit button to prevent multiple submissions.
+            // disable the submit button to prevent multiple submissions.
+            this.setSubmitButtonEnabled(false)
             this.model.save();
         },
 
@@ -77,6 +78,13 @@
             // TODO: Re-enable the submit button to allow the
             // user to resubmit.
             console.log('Error!');
+            this.setSubmitButtonEnabled(true)
+        },
+        setSubmitButtonEnabled: function( isEnabled ) {
+            $(this.submitButtonId)
+                .toggleClass( 'is-disabled', !isEnabled )
+                .prop( 'disabled', !isEnabled )
+                .attr('aria-disabled', !isEnabled);
         }
     });
 })( jQuery, _, Backbone, gettext );
