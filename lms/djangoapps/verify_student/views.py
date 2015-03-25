@@ -1056,14 +1056,6 @@ def reverification_window_expired(_request):
     return render_to_response("verify_student/reverification_window_expired.html")
 
 
-@login_required
-def incourse_reverification_confirmation(_request):  # pylint: disable=invalid-name
-    """
-    Shows the user a confirmation page if the submission to SoftwareSecure was successful
-    """
-    return render_to_response("verify_student/incourse_reverification_confirmation.html")
-
-
 class InCourseReverifyView(View):
     """
     The in-course reverification view.

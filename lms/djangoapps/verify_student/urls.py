@@ -146,10 +146,5 @@ urlpatterns = patterns(
         r'^reverify/{course_id}/(?P<checkpoint_name>\w+)/$'.format(course_id=settings.COURSE_ID_PATTERN),
         views.InCourseReverifyView.as_view(),
         name="verify_student_incourse_reverify"
-    ),
-    url(
-        r'^incourse_reverification_confirmation/$',
-        views.incourse_reverification_confirmation,
-        name="verify_student_incourse_reverification_confirmation"
-    ),
+    )
 )
