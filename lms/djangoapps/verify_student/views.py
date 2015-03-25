@@ -392,7 +392,6 @@ class PayAndVerifyView(View):
                 get_default_time_display(unexpired_paid_course_mode.expiration_datetime)
                 if unexpired_paid_course_mode.expiration_datetime else ""
             ),
-            'submit_photos_url': reverse('verify_student_submit_photos'),
         }
         return render_to_response("verify_student/pay_and_verify.html", context)
 
