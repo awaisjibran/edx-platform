@@ -94,7 +94,7 @@
             var children = XBlock.initializeXBlocks($element, requestToken);
             $element.prop('xblock_children', children);
 
-            return constructBlock($element, [initArgs(element)]);
+            return constructBlock(element, [initArgs(element)]);
         },
 
         /**
