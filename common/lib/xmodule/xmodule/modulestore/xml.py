@@ -53,10 +53,7 @@ def clean_out_mako_templating(xml_string):
     if orig_xml != xml_string:
         dog_stats_api.increment(
             'vscompat.deprecation',
-            tags=(
-                "location:xml_clean_out_mako_templating",
-                u"string:{}".format(orig_xml),
-            )
+            tags=("location:xml_clean_out_mako_templating",)
         )
     return xml_string
 
@@ -506,6 +503,8 @@ class XMLModuleStore(ModuleStoreReadBase):
                         'vscompat.deprecation',
                         tags=(
                             "location:xml_load_course_course_data_name",
+                            u"course:{}".format(course_data.get('course')),
+                            u"org:{}".format(course_data.get('org')),
                             u"name:{}".format(course_data.get('name')),
                         )
                     )
