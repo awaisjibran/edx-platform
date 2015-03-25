@@ -45,7 +45,7 @@ XMODULES = [
 ]
 XBLOCKS = [
     "library = xmodule.library_root_xblock:LibraryRoot",
-    "vertical = xmodule.vertical_module:VerticalBlock",
+    "vertical = xmodule.vertical_block:VerticalBlock",
     "wrapper = xmodule.wrapper_module:WrapperBlock",
 ]
 

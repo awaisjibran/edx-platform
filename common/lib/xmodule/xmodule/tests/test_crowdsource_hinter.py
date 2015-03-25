@@ -7,7 +7,7 @@ import unittest
 import copy
 
 from xmodule.crowdsource_hinter import CrowdsourceHinterModule
-from xmodule.vertical_module import VerticalBlock
+from xmodule.vertical_block import VerticalBlock
 from xmodule.x_module import STUDENT_VIEW
 from xblock.field_data import DictFieldData
 from xblock.fragment import Fragment

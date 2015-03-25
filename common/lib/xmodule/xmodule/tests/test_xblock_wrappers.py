@@ -43,7 +43,7 @@ from xmodule.crowdsource_hinter import CrowdsourceHinterDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.randomize_module import RandomizeDescriptor
-from xmodule.vertical_module import VerticalBlock
+from xmodule.vertical_block import VerticalBlock
 from xmodule.wrapper_module import WrapperBlock
 from xmodule.tests import get_test_descriptor_system, get_test_system
 

@@ -18,7 +18,7 @@ from xblock.exceptions import InvalidScopeError
 from xblock.fragment import Fragment
 
 from xmodule.seq_module import SequenceModule
-from xmodule.vertical_module import VerticalBlock
+from xmodule.vertical_block import VerticalBlock
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
