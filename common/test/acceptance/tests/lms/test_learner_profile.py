@@ -109,9 +109,6 @@ class LearnerProfilePageTest(WebAppTest):
         # Verify that profile visibility selector is shown/hidden according to own_profile
         self.assertEqual(self.learner_profile_page.visibility_selector_state, own_profile)
 
-        # Verify that fields are editable/non-editable whether a user is viewing her own profile or another profile
-        self.assertTrue(self.learner_profile_page.fields_editability(own_profile))
-
     def test_fields_on_my_private_profile(self):
         """
         Scenario: Verify that desired fields are shown when looking at her own private profile.

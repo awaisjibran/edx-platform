@@ -107,15 +107,3 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         Check if an icon is present for a field. Please note only dropdown fields have icons.
         """
         return self.icon_for_field(field_id, FIELD_ICONS[field_id])
-
-    def fields_editability(self, own_profile):
-        """
-        Check fields are editable/non-editable whether a user is viewing her own profile or another profile.
-
-        Arguments:
-            own_profile (bool):
-
-        Returns:
-            True/False
-        """
-        return True
