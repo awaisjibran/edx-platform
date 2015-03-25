@@ -12,7 +12,7 @@ class CoursewarePage(CoursePage):
     """
 
     url_path = "courseware/"
-    xblock_component_selector = '.vert .xblock. .xblock-content'
+    xblock_component_selector = '.vert .xblock.'
     section_selector = '.chapter'
     subsection_selector = '.chapter ul li'
 
