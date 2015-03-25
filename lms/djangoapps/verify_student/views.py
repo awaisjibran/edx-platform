@@ -1091,33 +1091,10 @@ class InCourseReverifyView(View):
         init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
         if not init_verification:
             return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))
-
-        display_steps = self._display_steps()
-        requirements = self._requirements(display_steps, request.user.is_active)
-        current_step = display_steps[0]['name']
-        expired_verified_course_mode, unexpired_paid_course_mode = PayAndVerifyView()._get_expired_verified_and_paid_mode(course_key)
-
         context = {
-            'contribution_amount': 10000,
-            'course': course,
             'course_key': unicode(course_key),
-            'course_mode': unexpired_paid_course_mode,
-            'courseware_url': "http:coursewareurl.com",
-            'current_step': current_step,
-            'disable_courseware_js': True,
-            'display_steps': display_steps,
-            'is_active': json.dumps(request.user.is_active),
-            'message_key': PayAndVerifyView.VERIFY_LATER_MSG,
-            'platform_name': settings.PLATFORM_NAME,
-            'purchase_endpoint': get_purchase_endpoint(),
-            'requirements': requirements,
-            'user_full_name': request.user.profile.name,
-            'verification_deadline': "",
-            'submit_photos_url': reverse('verify_student_incourse_reverify', kwargs={
-                "course_id": unicode(course_key),
-                "checkpoint_name": checkpoint_name
-            })
-
+            "course_name": course.display_name_with_default,
+            'checkpoint_name': checkpoint_name,
         }
         return render_to_response("verify_student/incourse_reverify.html", context)
 
@@ -1166,68 +1143,3 @@ class InCourseReverifyView(View):
                 "error": True,
             }
             return render_to_response("verify_student/incourse_reverify.html", context)
-
-    def _display_steps(self):
-        """Determine which steps to display to the user.
-
-        Includes all steps by default, but removes steps
-        if the user has already completed them.
-
-        Arguments:
-
-            always_show_payment (bool): If True, display the payment steps
-                even if the user has already paid.
-
-            already_verified (bool): Whether the user has submitted
-                a verification request recently.
-
-            already_paid (bool): Whether the user is enrolled in a paid
-                course mode.
-
-        Returns:
-            list
-
-        """
-        display_steps = PayAndVerifyView.VERIFICATION_STEPS
-        remove_steps = set()
-        remove_steps |= set([PayAndVerifyView.ID_PHOTO_STEP])
-        return [
-            {
-                'name': step,
-                'title': unicode(PayAndVerifyView.STEP_INFO[step].title),
-                'templateName': PayAndVerifyView.STEP_INFO[step].template_name
-            }
-            for step in display_steps
-            if step not in remove_steps
-        ]
-
-    def _requirements(self, display_steps, is_active):
-        """Determine which requirements to show the user.
-
-        For example, if the user needs to submit a photo
-        verification, tell the user that she will need
-        a photo ID and a webcam.
-
-        Arguments:
-            display_steps (list): The steps to display to the user.
-            is_active (bool): If False, adds a requirement to activate the user account.
-
-        Returns:
-            dict: Keys are requirement names, values are booleans
-                indicating whether to show the requirement.
-
-        """
-        all_requirements = {
-            PayAndVerifyView.ACCOUNT_ACTIVATION_REQ: not is_active,
-            PayAndVerifyView.PHOTO_ID_REQ: False,
-            PayAndVerifyView.WEBCAM_REQ: False,
-        }
-
-        display_steps = set(step['name'] for step in display_steps)
-
-        for step, step_requirements in PayAndVerifyView.STEP_REQUIREMENTS.iteritems():
-            if step in display_steps:
-                for requirement in step_requirements:
-                    all_requirements[requirement] = True
-
-        return all_requirements
