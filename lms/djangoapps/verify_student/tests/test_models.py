@@ -20,7 +20,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from verify_student.models import (
-    SoftwareSecurePhotoVerification, VerificationException, VerificationCheckpoint
+    SoftwareSecurePhotoVerification, VerificationException, VerificationCheckpoint, VerificationStatus
 )
 
 FAKE_SETTINGS = {
@@ -604,14 +604,14 @@ class TestMidcourseReverification(ModuleStoreTestCase):
         attempt.save()
         assert_true(SoftwareSecurePhotoVerification.user_has_valid_or_pending(user=self.user, window=window))
 
-# Lots of patching to stub in our own settings, S3 substitutes, and HTTP posting
+
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('verify_student.models.S3Connection', new=MockS3Connection)
 @patch('verify_student.models.Key', new=MockKey)
 @patch('verify_student.models.requests.post', new=mock_software_secure_post)
 @ddt.ddt
 class VerificationCheckpointTest(ModuleStoreTestCase):
-    """Tests for the ExampleCertificate model. """
+    """Tests for the VerificationCheckpoint model. """
 
     def setUp(self):
         super(VerificationCheckpointTest, self).setUp()
@@ -620,33 +620,93 @@ class VerificationCheckpointTest(ModuleStoreTestCase):
 
     @ddt.data('midterm', "final")
     def test_get_verification_checkpoint(self, check_point):
+        """testing class method of VerificationCheckpoint. create the object and then uses the class method to get the
+        verification check point.
+        """
+        # create the VerificationCheckpoint checkpoint
         ver_check_point = VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name=check_point)
-        assert_equals(ver_check_point.get_verification_checkpoint(self.course.id,check_point), ver_check_point)
+        assert_equals(VerificationCheckpoint.get_verification_checkpoint(self.course.id, check_point), ver_check_point)
+
+    def test_get_verification_checkpoint_for_not_existing_values(self):
+        """testing class method of VerificationCheckpoint. create the object and then uses the class method to get the
+        verification check point.
+        """
+        # create the VerificationCheckpoint checkpoint
+        VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name='midterm')
+
+        # get verification for not existing checkpoint
+        assert_equals(VerificationCheckpoint.get_verification_checkpoint(self.course.id, 'abc'), None)
 
     def test_unique_together_constraint(self):
+        """testing the unique together contraint.
         """
-        """
+        # create the VerificationCheckpoint checkpoint
         VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name="midterm")
 
+        # create the VerificationCheckpoint checkpoint with same course id and checkpoint name
         with self.assertRaises(IntegrityError):
             VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name="midterm")
 
     def test_add_verification_attempt_software_secure(self):
+        """testing manytomany relationship. adding softwaresecure attempt to the verification checkpoints.
         """
-
-        """
+        # adding two check points.
         check_point1 = VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name="midterm")
         check_point2 = VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name="final")
-        # Make an attempt
+
+        # Make an attempt and added to the checkpoint1.
         check_point1.add_verification_attempt(SoftwareSecurePhotoVerification.objects.create(user=self.user))
         self.assertEqual(len(check_point1.photo_verification.all()), 1)
 
+        # Make an other attempt and added to the checkpoint1.
         check_point1.add_verification_attempt(SoftwareSecurePhotoVerification.objects.create(user=self.user))
         self.assertEqual(len(check_point1.photo_verification.all()), 2)
 
+        # make new attempt and adding to the checkpoint2
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
         check_point2.add_verification_attempt(attempt)
         self.assertEqual(len(check_point2.photo_verification.all()), 1)
 
+        # remove the attempt from checkpoint2
         check_point2.photo_verification.remove(attempt)
-        self.assertEqual(len(check_point2.photo_verification.all()),0)
+        self.assertEqual(len(check_point2.photo_verification.all()), 0)
+
+
+@ddt.ddt
+class VerificationStatusTest(ModuleStoreTestCase):
+    """Tests for the VerificationCheckpoint model. """
+
+    def setUp(self):
+        super(VerificationStatusTest, self).setUp()
+        self.user = UserFactory.create()
+        self.course = CourseFactory.create()
+        self.check_point1 = VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name="midterm")
+        self.check_point2 = VerificationCheckpoint.objects.create(course_id=self.course.id, checkpoint_name="final")
+
+    @ddt.data('submitted', "approved", "denied", "error")
+    def test_add_verification_status(self, status):
+        """adding verfication status using the class method."""
+
+        # adding verification status
+        VerificationStatus.add_verification_status(checkpoint=self.check_point1, user=self.user, status=status)
+
+        # getting the status from db
+        result = VerificationStatus.objects.filter(checkpoint=self.check_point1)[0]
+        self.assertEqual(result.status, status)
+        self.assertEqual(result.user, self.user)
+
+    @ddt.data('submitted', "approved", "denied", "error")
+    def test_add_status_from_checkpoints(self, status):
+        """adding verfication status for checkpoints list."""
+
+        # adding verification status with multiple points
+        VerificationStatus.add_status_from_checkpoints(
+            checkpoints=[self.check_point1, self.check_point2], user=self.user, status=status
+        )
+
+        # getting the status from db.
+        result = VerificationStatus.objects.filter(user=self.user)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].checkpoint.checkpoint_name, self.check_point1.checkpoint_name)
+        self.assertEqual(result[1].checkpoint.checkpoint_name, self.check_point2.checkpoint_name)
+

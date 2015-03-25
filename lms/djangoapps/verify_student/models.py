@@ -898,7 +898,7 @@ class VerificationCheckpoint(models.Model):
     checkpoint_name = models.CharField(unique=True, max_length=32, choices=CHECKPOINT_CHOICES)
     photo_verification = models.ManyToManyField(SoftwareSecurePhotoVerification)
 
-    class Meta:
+    class Meta:  # pylint: disable=missing-docstring, old-style-class
         unique_together = (('course_id', 'checkpoint_name'),)
 
     def add_verification_attempt(self, verification_attempt):
@@ -910,7 +910,7 @@ class VerificationCheckpoint(models.Model):
         Returns:
             None
         """
-        self.photo_verification.add(verification_attempt)
+        self.photo_verification.add(verification_attempt)  # pylint: disable=no-member
 
     @classmethod
     def get_verification_checkpoint(cls, course_id, checkpoint_name):
