@@ -605,10 +605,6 @@ class TestMidcourseReverification(ModuleStoreTestCase):
         assert_true(SoftwareSecurePhotoVerification.user_has_valid_or_pending(user=self.user, window=window))
 
 
-@patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
-@patch('verify_student.models.S3Connection', new=MockS3Connection)
-@patch('verify_student.models.Key', new=MockKey)
-@patch('verify_student.models.requests.post', new=mock_software_secure_post)
 @ddt.ddt
 class VerificationCheckpointTest(ModuleStoreTestCase):
     """Tests for the VerificationCheckpoint model. """
@@ -674,7 +670,7 @@ class VerificationCheckpointTest(ModuleStoreTestCase):
 
 @ddt.ddt
 class VerificationStatusTest(ModuleStoreTestCase):
-    """Tests for the VerificationCheckpoint model. """
+    """Tests for the VerificationStatus model. """
 
     def setUp(self):
         super(VerificationStatusTest, self).setUp()
