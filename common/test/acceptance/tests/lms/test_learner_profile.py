@@ -172,7 +172,7 @@ class LearnerProfilePageTest(WebAppTest):
         And I reload the page.
         Then I shouldn't see the profile visibility selector dropdown.
         Then I see all the profile fields are shown.
-        And `location`, `language` and `about me` fields are not editable.
+        Also `location`, `language` and `about me` fields are not editable.
         """
         self.visit_other_profile_page(self.OTHER_USER, privacy=self.PRIVACY_PUBLIC)
         self.visit_other_profile_page(self.MY_USER)

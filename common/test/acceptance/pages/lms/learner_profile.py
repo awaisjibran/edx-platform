@@ -59,6 +59,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         Returns:
             True/False
         """
+        self.wait_for_ajax()
         return self.q(css='.u-field-{}'.format(field_id)).visible
 
     @property
@@ -66,6 +67,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         Return list of visible fields.
         """
+        self.wait_for_ajax()
         fields = ['username', 'country', 'language', 'bio']
         return [field for field in fields if self.field_is_visible(field)]
 
@@ -77,6 +79,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         Returns:
             True/False
         """
+        self.wait_for_ajax()
         return self.q(css='#u-field-select-account_privacy').visible
 
     def country(self, value=None):
