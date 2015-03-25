@@ -114,6 +114,7 @@ AUTH_EMAIL_OPT_IN_KEY = 'email_opt_in'
 AUTH_ENTRY_DASHBOARD = 'dashboard'
 AUTH_ENTRY_LOGIN = 'login'
 AUTH_ENTRY_REGISTER = 'register'
+AUTH_ENTRY_ACCOUNT_SETTINGS = 'account_settings'
 
 # This is left-over from an A/B test
 # of the new combined login/registration page (ECOM-369)
@@ -135,6 +136,7 @@ AUTH_DISPATCH_URLS = {
     AUTH_ENTRY_DASHBOARD: '/dashboard',
     AUTH_ENTRY_LOGIN: '/login',
     AUTH_ENTRY_REGISTER: '/register',
+    AUTH_ENTRY_ACCOUNT_SETTINGS: '/account/settings',
 
     # This is left-over from an A/B test
     # of the new combined login/registration page (ECOM-369)
@@ -149,6 +151,7 @@ _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_DASHBOARD,
     AUTH_ENTRY_LOGIN,
     AUTH_ENTRY_REGISTER,
+    AUTH_ENTRY_ACCOUNT_SETTINGS,
 
     # This is left-over from an A/B test
     # of the new combined login/registration page (ECOM-369)

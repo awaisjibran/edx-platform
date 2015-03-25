@@ -35,6 +35,7 @@ from student.views import (
 )
 from student_account.helpers import auth_pipeline_urls
 import third_party_auth
+from third_party_auth import pipeline
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
@@ -304,6 +305,7 @@ def _external_auth_intercept(request, mode):
 
 @login_required
 @require_http_methods(['GET'])
+@ensure_csrf_cookie
 def account_settings(request):
     """Render the current user's account settings page.
 
@@ -343,8 +345,7 @@ def account_settings_context(user):
     year_of_birth_options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
 
     context = {
-        'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
-        'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
+        'auth': {},
         'fields': {
             'country': {
                 'options': country_options,
@@ -361,7 +362,19 @@ def account_settings_context(user):
             }, 'preferred_language': {
                 'options': settings.ALL_LANGUAGES,
             }
-        }
+        },
+        'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
+        'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
     }
+
+    if third_party_auth.is_enabled():
+        auth_states = pipeline.get_provider_user_states(user)
+
+        context['auth']['providers'] = [{
+            'name': state.provider.NAME,
+            'connected': state.has_account,
+            'connect_url': pipeline.get_login_url(state.provider.NAME, pipeline.AUTH_ENTRY_DASHBOARD),
+            'disconnect_url': pipeline.get_disconnect_url(state.provider.NAME),
+        } for state in auth_states]
 
     return context

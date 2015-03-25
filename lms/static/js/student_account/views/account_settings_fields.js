@@ -318,6 +318,66 @@
             },
         });
 
+        AccountSettingsFieldViews.AuthFieldView = AccountSettingsFieldViews.LinkFieldView.extend({
+
+            initialize: function (options) {
+                this._super(options);
+                _.bindAll(this, 'disconnect', 'successMessage', 'inProgressMessage');
+            },
+
+            render: function () {
+                this.$el.html(this.template({
+                    id: this.options.valueAttribute,
+                    title: this.options.title,
+                    linkTitle: this.options.connected ? gettext('Unlink') : gettext('Link'),
+                    linkHref: '',
+                    message: this.helpMessage
+                }));
+                return this;
+            },
+
+            linkClicked: function () {
+                event.preventDefault();
+
+                this.showInProgressMessage();
+
+                if (this.options.connected) {
+                    this.disconnect();
+                } else {
+                    window.location.href =  this.options.connectUrl;
+                }
+            },
+
+            disconnect: function (event) {
+                var data = {};
+                data['csrfmiddlewaretoken'] = this.options.csrfToken;
+
+                var view = this;
+                $.ajax({
+                    type: 'POST',
+                    url: this.options.disconnectUrl,
+                    data: data,
+                    dataType: 'html',
+                    success: function (data, status, xhr) {
+                        view.options.connected = false;
+                        view.render();
+                        view.showSuccessMessage();
+                    },
+                    error: function (xhr, status, error) {
+                        view.showErrorMessage(xhr);
+                    }
+                });
+            },
+
+            inProgressMessage: function() {
+                return this.indicators['inProgress'] + (this.options.connected ? gettext('Unlinking') : gettext('Linking'));
+            },
+
+            successMessage: function() {
+                return this.indicators['success'] + gettext('Successfully unlinked.');
+            },
+        });
+
         return AccountSettingsFieldViews;
     })
 }).call(this, define || RequireJS.define);

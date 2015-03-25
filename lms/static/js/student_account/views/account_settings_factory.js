@@ -8,7 +8,7 @@
         'js/student_account/views/account_settings_view',
     ], function (gettext, $, _, Backbone, UserAccountModel, UserPreferencesModel, FieldViews, AccountSettingsView) {
 
-        return function (fieldsData, userAccountsApiUrl, userPreferencesApiUrl) {
+        return function (fieldsData, authData, userAccountsApiUrl, userPreferencesApiUrl, csrfToken) {
 
             var accountSettingsElement = $('.wrapper-account-settings');
 
@@ -116,30 +116,27 @@
                         }
                     ]
                 },
-                {
+            ];
+
+            if (_.isArray(authData.providers)) {
+                var accountsSectionData = {
                     title: gettext('Connected Accounts'),
-                    fields: [
-                        {
-                            view: new FieldViews.LinkFieldView({
-                                model: userAccountModel,
-                                title: gettext('Facebook'),
-                                valueAttribute: 'auth-facebook',
-                                linkTitle: gettext('Link'),
-                                helpMessage: gettext('Coming soon.')
-                            })
-                        },
-                        {
-                            view: new FieldViews.LinkFieldView({
-                                model: userAccountModel,
-                                title: gettext('Google'),
-                                valueAttribute: 'auth-google',
-                                linkTitle: gettext('Link'),
-                                helpMessage: gettext('Coming soon.')
+                    fields: _.map(authData.providers, function(provider) {
+                        return {
+                            'view': new FieldViews.AuthFieldView({
+                                title: provider.name,
+                                valueAttribute: 'auth-' + provider.name.toLowerCase(),
+                                helpMessage: gettext(''),
+                                connected: provider['connected'],
+                                connectUrl: provider['connect_url'],
+                                disconnectUrl: provider['disconnect_url'],
+                                csrfToken: csrfToken
                             })
                         }
-                    ]
-                }
-            ];
+                    })
+                };
+                sectionsData.push(accountsSectionData);
+            }
 
             var accountSettingsView = new AccountSettingsView({
                 el: accountSettingsElement,
