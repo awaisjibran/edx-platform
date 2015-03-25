@@ -47,7 +47,7 @@ from reverification.models import MidcourseReverificationWindow
 import ssencrypt
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import CourseKey
-from .exceptions import WindowExpiredException, VerificationCheckpointException
+from .exceptions import WindowExpiredException
 from xmodule.modulestore.django import modulestore
 from microsite_configuration import microsite
 
@@ -1107,9 +1107,8 @@ class InCourseReverifyView(View):
             course_key = CourseKey.from_string(course_id)
             checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_key, checkpoint_name)
             if checkpoint is None:
-                log.exception("Checkpoint is not defined. Could not submit verification attempt for user {}".format(
-                    request.user.id)
-                )
+                log.error("Checkpoint is not defined. Could not submit verification attempt for user %s",
+                          request.user.id)
                 context = {
                     "user_full_name": request.user.profile.name,
                     "error": True
@@ -1117,7 +1116,7 @@ class InCourseReverifyView(View):
                 return render_to_response("verify_student/incourse_reverify.html", context)
             init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
             if not init_verification:
-                log.exception("Could not submit verification attempt for user {}".format(request.user.id))
+                log.error("Could not submit verification attempt for user %s", request.user.id)
                 return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))
             b64_face_image = request.POST['face_image'].split(",")[1]
             attempt = SoftwareSecurePhotoVerification(user=request.user)
@@ -1134,8 +1133,6 @@ class InCourseReverifyView(View):
 
             return HttpResponse(json.dumps("Completed!"), content_type="application/json")
         except Exception:
-            log.exception(
-                "Could not submit verification attempt for user {}".format(request.user.id)
-            )
+            log.error("Could not submit verification attempt for user %s", request.user.id)
             msg = _("Could not submit photos")
             return HttpResponseBadRequest(msg)
