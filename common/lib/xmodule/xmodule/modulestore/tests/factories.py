@@ -270,8 +270,8 @@ class ItemFactory(XModuleFactory):
                 dog_stats_api.increment(
                     'vscompat.deprecation',
                     tags=(
-                        "block:{}".format(location.block_type),
-                        "location:itemfactory_create_static_tab"
+                        "location:itemfactory_create_static_tab",
+                        u"block:{}".format(location.block_type),
                     )
                 )
 

@@ -54,8 +54,8 @@ def clean_out_mako_templating(xml_string):
         dog_stats_api.increment(
             'vscompat.deprecation',
             tags=(
-                "string:{}".format(orig_xml),
-                "location:xml_clean_out_mako_templating"
+                "location:xml_clean_out_mako_templating",
+                u"string:{}".format(orig_xml),
             )
         )
     return xml_string
@@ -127,8 +127,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     dog_stats_api.increment(
                         'vscompat.deprecation',
                         tags=(
-                            "name:{}".format(orig_name),
-                            "location:import_system_fallback_name"
+                            "location:import_system_fallback_name",
+                            u"name:{}".format(orig_name),
                         )
                     )
 
@@ -490,8 +490,8 @@ class XMLModuleStore(ModuleStoreReadBase):
                     dog_stats_api.increment(
                         'vscompat.deprecation',
                         tags=(
-                            "course:{}".format(course),
-                            "location:xml_load_course_policy_dir"
+                            "location:xml_load_course_policy_dir",
+                            u"course:{}".format(course),
                         )
                     )
 
@@ -505,8 +505,8 @@ class XMLModuleStore(ModuleStoreReadBase):
                     dog_stats_api.increment(
                         'vscompat.deprecation',
                         tags=(
-                            "action:{}".format(course_data.get('name')),
-                            "location:xml_load_course_course_data_name"
+                            "location:xml_load_course_course_data_name",
+                            u"name:{}".format(course_data.get('name')),
                         )
                     )
 
@@ -699,8 +699,8 @@ class XMLModuleStore(ModuleStoreReadBase):
                             dog_stats_api.increment(
                                 'vscompat.deprecation',
                                 tags=(
-                                    "course_dir:{}".format(course_dir),
-                                    "location:xml_load_extra_content_static_tab"
+                                    "location:xml_load_extra_content_static_tab",
+                                    u"course_dir:{}".format(course_dir),
                                 )
                             )
 

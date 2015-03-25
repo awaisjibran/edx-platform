@@ -239,8 +239,8 @@ def _has_access_course_desc(user, action, course):
             dog_stats_api.increment(
                 'vscompat.deprecation',
                 tags=(
+                    "location:has_access_course_desc_see_exists",
                     u"course:{}".format(course),
-                    "location:has_access_course_desc_see_exists"
                 )
             )
 

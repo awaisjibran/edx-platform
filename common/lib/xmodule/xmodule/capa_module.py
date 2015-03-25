@@ -159,9 +159,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     def backcompat_paths(cls, path):
         dog_stats_api.increment(
             'vscompat.deprecation',
-            tags=(
-                "location:capa_descriptor_backcompat_paths",
-            )
+            tags=("location:capa_descriptor_backcompat_paths",)
         )
         return [
             'problems/' + path[8:],

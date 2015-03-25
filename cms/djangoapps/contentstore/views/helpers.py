@@ -256,8 +256,8 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
             dog_stats_api.increment(
                 'vscompat.deprecation',
                 tags=(
-                    "course:{}".format(unicode(dest_usage_key.course_key)),
-                    "location:create_xblock_static_tab"
+                    "location:create_xblock_static_tab",
+                    u"course:{}".format(unicode(dest_usage_key.course_key)),
                 )
             )
 
