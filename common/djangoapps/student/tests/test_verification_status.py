@@ -91,7 +91,6 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     def test_need_to_verify_expiration(self):
         self._setup_mode_and_enrollment(self.FUTURE, "verified")
         response = self.client.get(self.dashboard_url)
-        self.assertContains(response, self.BANNER_ALT_MESSAGES[VERIFY_STATUS_NEED_TO_VERIFY])
         self.assertContains(response, "You only have 4 days left to verify for this course.")
 
     @ddt.data(None, FUTURE)
