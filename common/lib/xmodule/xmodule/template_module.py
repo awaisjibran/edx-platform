@@ -45,7 +45,7 @@ class CustomTagDescriptor(RawDescriptor):
             # VS[compat]  backwards compatibility with old nested customtag structure
             dog_stats_api.increment(
                 'vscompat.deprecation',
-                tags=("location:customtag_descriptor_render_template")
+                tags=("location:customtag_descriptor_render_template",)
             )
 
             child_impl = xmltree.find('impl')

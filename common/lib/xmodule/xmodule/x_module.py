@@ -863,7 +863,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         if key in cls.metadata_translations:
             dog_stats_api.increment(
                 'vscompat.deprecation',
-                tags=("location:xmodule_descriptor_translate")
+                tags=("location:xmodule_descriptor_translate",)
             )
         return cls.metadata_translations.get(key, key)
 

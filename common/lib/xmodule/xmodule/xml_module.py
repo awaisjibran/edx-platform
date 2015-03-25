@@ -205,7 +205,7 @@ class XmlDescriptor(XModuleDescriptor):
         else:
             dog_stats_api.increment(
                 'vscompat.deprecation',
-                tags=("location:xmlparser_util_mixin_load_definition_filename")
+                tags=("location:xmlparser_util_mixin_load_definition_filename",)
             )
 
             filepath = cls._format_filepath(xml_object.tag, filename)
@@ -218,7 +218,7 @@ class XmlDescriptor(XModuleDescriptor):
             if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
                 dog_stats_api.increment(
                     'vscompat.deprecation',
-                    tags=("location:xmlparser_util_mixin_load_definition_backcompat")
+                    tags=("location:xmlparser_util_mixin_load_definition_backcompat",)
                 )
 
                 candidates = cls.backcompat_paths(filepath)
@@ -261,7 +261,7 @@ class XmlDescriptor(XModuleDescriptor):
                         'vscompat.deprecation',
                         tags=(
                             "location:xmlparser_util_mixin_load_metadata",
-                            u"metadata:{}".format(attr)
+                            "metadata:{}".format(attr),
                         )
                     )
                 # don't load these
@@ -317,7 +317,7 @@ class XmlDescriptor(XModuleDescriptor):
             definition_xml = xml_object
             dog_stats_api.increment(
                 'vscompat.deprecation',
-                tags=("location:xmlparser_util_mixin_parse_xml")
+                tags=("location:xmlparser_util_mixin_parse_xml",)
             )
 
         definition, children = cls.load_definition(definition_xml, system, def_id, id_generator)  # note this removes metadata
