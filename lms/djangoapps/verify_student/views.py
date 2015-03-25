@@ -1102,23 +1102,24 @@ class InCourseReverifyView(View):
         """
         submits the reverification to SoftwareSecure
         """
+
+        user = request.user
+        course_key = CourseKey.from_string(course_id)
+        checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_key, checkpoint_name)
+        if checkpoint is None:
+            log.error("Checkpoint is not defined. Could not submit verification attempt for user %s",
+                      request.user.id)
+            context = {
+                "user_full_name": request.user.profile.name,
+                "error": True
+            }
+            return render_to_response("verify_student/incourse_reverify.html", context)
+        init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
+        if not init_verification:
+            log.error("Could not submit verification attempt for user %s", request.user.id)
+            return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))
+
         try:
-            user = request.user
-            course_key = CourseKey.from_string(course_id)
-            checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_key, checkpoint_name)
-            if checkpoint is None:
-                log.exception("Checkpoint is not defined. Could not submit verification attempt for user {}".format(
-                    request.user.id)
-                )
-                context = {
-                    "user_full_name": request.user.profile.name,
-                    "error": True
-                }
-                return render_to_response("verify_student/incourse_reverify.html", context)
-            init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
-            if not init_verification:
-                log.exception("Could not submit verification attempt for user {}".format(request.user.id))
-                return redirect(reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_key)}))
             b64_face_image = request.POST['face_image'].split(",")[1]
             attempt = SoftwareSecurePhotoVerification(user=request.user)
             attempt.upload_face_image(b64_face_image.decode('base64'))
@@ -1129,13 +1130,12 @@ class InCourseReverifyView(View):
             attempt.submit()
 
             checkpoint.add_verification_attempt(attempt)
-
             VerificationStatus.add_verification_status(checkpoint, user, "submitted")
-
             return HttpResponse(json.dumps("Completed!"), content_type="application/json")
-        except Exception:
-            log.exception(
-                "Could not submit verification attempt for user {}".format(request.user.id)
-            )
+        except IndexError:
+            log.error("Invalid image data during photo verification.")
+            return HttpResponseBadRequest(_("Invalid image data during photo verification."))
+        except:
+            log.error("Could not submit verification attempt for user %s", request.user.id)
             msg = _("Could not submit photos")
             return HttpResponseBadRequest(msg)
