@@ -89,12 +89,13 @@
          */
         initializeBlock: function(element, requestToken) {
             var $element = $(element);
+            var $content = $element.children('.xblock-content');
 
             var requestToken = requestToken || $element.data('request-token');
-            var children = XBlock.initializeXBlocks($element, requestToken);
-            $element.prop('xblock_children', children);
+            var children = XBlock.initializeXBlocks($content, requestToken);
+            $content.prop('xblock_children', children);
 
-            return constructBlock(element, [initArgs(element)]);
+            return constructBlock($content.get(0), [initArgs(element)]);
         },
 
         /**

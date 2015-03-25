@@ -839,7 +839,7 @@ def _import_course_draft(
 
                         drafts.append(draft)
 
-                except Exception:  # pylint: disable=broad-except
+                except Exception:  # pylint: disalbe=broad-except
                     logging.exception('Error while parsing course xml.')
 
     # sort drafts by `index_in_children_list` attribute
