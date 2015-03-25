@@ -100,7 +100,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         Get or set aboutme.
         """
-        return self.value_for_textarea_field('bio', None ,value)
+        return self.value_for_textarea_field('bio', None, value)
 
     def field_icon_present(self, field_id):
         """

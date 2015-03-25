@@ -13,10 +13,13 @@
 
     &.editable-toggle.mode-display:hover {
         background-color: $m-blue-l4;
+        border-radius: 3px;
 
         .message-can-edit {
             display: inline-block;
+            color: $link-color;
         }
+
     }
 
     &.mode-hidden {
