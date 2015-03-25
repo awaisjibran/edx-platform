@@ -191,14 +191,14 @@ class LearnerProfilePageTest(WebAppTest):
         """
         self.visit_my_profile_page(self.MY_USER, privacy=self.PRIVACY_PUBLIC)
 
-        self.my_profile_page.value_for_dropdown_field(field_id, new_value)
-        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id), displayed_value)
+        self.my_profile_page.value_for_dropdown_field(field_id, mode, new_value)
+        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id, mode=mode), displayed_value)
         self.assertTrue(self.my_profile_page.mode_for_field(field_id), mode)
 
         self.browser.refresh()
         self.my_profile_page.wait_for_page()
 
-        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id), displayed_value)
+        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id, mode=mode), displayed_value)
         self.assertTrue(self.my_profile_page.mode_for_field(field_id), mode)
 
     def _test_textarea_field(self, field_id, new_value, displayed_value, mode):
@@ -207,14 +207,14 @@ class LearnerProfilePageTest(WebAppTest):
         """
         self.visit_my_profile_page(self.MY_USER, privacy=self.PRIVACY_PUBLIC)
 
-        self.my_profile_page.value_for_textarea_field(field_id, new_value)
-        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id), displayed_value)
+        self.my_profile_page.value_for_textarea_field(field_id, mode=mode, value=new_value)
+        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id, mode=mode), displayed_value)
         self.assertTrue(self.my_profile_page.mode_for_field(field_id), mode)
 
         self.browser.refresh()
         self.my_profile_page.wait_for_page()
 
-        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id), displayed_value)
+        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id, mode=mode), displayed_value)
         self.assertTrue(self.my_profile_page.mode_for_field(field_id), mode)
 
     def test_country_field(self):
@@ -222,6 +222,7 @@ class LearnerProfilePageTest(WebAppTest):
         Test behaviour of `Country` field.
         """
         self._test_dropdown_field('country', 'Pakistan', 'Pakistan', 'display')
+        self._test_dropdown_field('country', '', 'Add country', 'placeholder')
 
         self.my_profile_page.make_field_editable('country')
         self.assertTrue(self.my_profile_page.mode_for_field('country'), 'edit')

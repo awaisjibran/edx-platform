@@ -68,6 +68,8 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         Return list of visible fields.
         """
         self.wait_for_ajax()
+        self.wait_for_element_visibility('.u-field-username', 'username is not visible')
+
         fields = ['username', 'country', 'language', 'bio']
         return [field for field in fields if self.field_is_visible(field)]
 
@@ -98,7 +100,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         Get or set aboutme.
         """
-        return self.value_for_textarea_field('bio', value)
+        return self.value_for_textarea_field('bio', None ,value)
 
     def field_icon_present(self, field_id):
         """
