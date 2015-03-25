@@ -1,3 +1,6 @@
+"""
+Code to handle mako templating for XModules and XBlocks.
+"""
 from .x_module import XModuleDescriptor, DescriptorSystem, shim_xmodule_js
 from xblock.fragment import Fragment
 
@@ -41,6 +44,9 @@ class MakoTemplateBlock(object):
         }
 
     def studio_view(self, context):
+        """
+        View used in Studio.
+        """
         fragment = Fragment(
             self.system.render_template(self.mako_template, self.get_context())
         )
@@ -49,5 +55,8 @@ class MakoTemplateBlock(object):
 
 
 class MakoModuleDescriptor(MakoTemplateBlock, XModuleDescriptor):
+    """
+    Mixin to use for XModule descriptors.
+    """
     def get_html(self):
         return self.studio_view(None).content
