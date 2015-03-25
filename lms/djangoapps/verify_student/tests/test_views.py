@@ -1646,6 +1646,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
     """
     Tests for the incourse reverification views.
     """
+    IMAGE_DATA = "abcd,1234"
     def setUp(self):
         super(TestInCourseReverifyView, self).setUp()
 
@@ -1674,7 +1675,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_incourse_reverify_invalid_checkpoint_get(self):
         url = reverse('verify_student_incourse_reverify',
-                      kwargs={"course_id": "invalid/course/key", "checkpoint_name": "midterm"})
+                      kwargs={"course_id": unicode(self.course_key), "checkpoint_name": "invalid_checkpoint"})
         response = self.client.get(url)
 
         self.assertEquals(response.status_code, 404)
@@ -1692,16 +1693,62 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_incourse_reverify_get(self):
         self._create_checkpoint()
-        attempt = SoftwareSecurePhotoVerification(user=self.user)
-        attempt.mark_ready()
-        attempt.save()
-        attempt.submit()
+        self._create_initial_verification()
         url = reverse('verify_student_incourse_reverify',
                       kwargs={"course_id": unicode(self.course_key), "checkpoint_name": "midterm"})
         response = self.client.get(url)
-
         self.assertEquals(response.status_code, 200)
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    @patch('verify_student.views.render_to_response', render_mock)
+    def test_invalid_checkpoint_post(self):
+        url = reverse('verify_student_incourse_reverify',
+                      kwargs={"course_id": unicode(self.course_key), "checkpoint_name": "midterm"})
+        response = self.client.post(url)
+        self.assertEquals(response.status_code, 200)
+        ((template, context), _kwargs) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
+        self.assertIn('incourse_reverify', template)
+        self.assertTrue(context['error'])
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_incourse_reverify_initial_redirect_post(self):
+        self._create_checkpoint()
+        url = reverse('verify_student_incourse_reverify',
+                      kwargs={"course_id": unicode(self.course_key), "checkpoint_name": "midterm"})
+        response = self.client.post(url)
+        url = reverse('verify_student_verify_later',
+                      kwargs={"course_id": unicode(self.course_key)})
+
+        self.assertRedirects(response, url)
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_incourse_reverify_index_error_post(self):
+        self._create_checkpoint()
+        self._create_initial_verification()
+        url = reverse('verify_student_incourse_reverify',
+                      kwargs={
+                          "course_id": unicode(self.course_key),
+                          "checkpoint_name": "midterm"})
+        response = self.client.post(url, {"face_image": ""})
+        self.assertEqual(response.status_code, 400)
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_incourse_reverify_post(self):
+        self._create_checkpoint()
+        self._create_initial_verification()
+        url = reverse('verify_student_incourse_reverify',
+                      kwargs={
+                          "course_id": unicode(self.course_key),
+                          "checkpoint_name": "midterm"})
+        response = self.client.post(url, {"face_image": self.IMAGE_DATA})
+        self.assertEqual(response.status_code, 200)
 
     def _create_checkpoint(self):
         checkpoint = VerificationCheckpoint(course_id=self.course_key, checkpoint_name="midterm")
         checkpoint.save()
+
+    def _create_initial_verification(self):
+        attempt = SoftwareSecurePhotoVerification(user=self.user)
+        attempt.mark_ready()
+        attempt.save()
+        attempt.submit()

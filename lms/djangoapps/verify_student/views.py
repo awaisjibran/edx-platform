@@ -1097,13 +1097,17 @@ class InCourseReverifyView(View):
 
         user = request.user
         course_key = CourseKey.from_string(course_id)
+        course = modulestore().get_course(course_key)
         checkpoint = VerificationCheckpoint.get_verification_checkpoint(course_key, checkpoint_name)
         if checkpoint is None:
             log.error("Checkpoint is not defined. Could not submit verification attempt for user %s",
                       request.user.id)
             context = {
-                "user_full_name": request.user.profile.name,
-                "error": True
+                'course_key': unicode(course_key),
+                "course_name": course.display_name_with_default,
+                'checkpoint_name': checkpoint_name,
+                "error": True,
+                "errorMsg": "No checkpoint found"
             }
             return render_to_response("verify_student/incourse_reverify.html", context)
         init_verification = SoftwareSecurePhotoVerification.get_initial_verification(user)
