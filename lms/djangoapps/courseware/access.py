@@ -236,9 +236,13 @@ def _has_access_course_desc(user, action, course):
         # properly configured enrollment_start times (if course should be
         # staff-only, set enrollment_start far in the future.)
         if settings.FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
-            tags = [ "action:{}".format(course) ]
-            tags.append("location:has_access_course_desc_see_exists")
-            dog_stats_api.increment('vscompat.deprecation', tags=tags)
+            dog_stats_api.increment(
+                'vscompat.deprecation',
+                tags=(
+                    u"course:{}".format(course),
+                    "location:has_access_course_desc_see_exists"
+                )
+            )
 
             # if this feature is on, only allow courses that have ispublic set to be
             # seen by non-staff

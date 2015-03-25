@@ -861,8 +861,10 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     def _translate(cls, key):
         'VS[compat]'
         if key in cls.metadata_translations:
-            tags = [ "location:xmodule_descriptor_translate" ]
-            dog_stats_api.increment('vscompat.deprecation', tags=tags)
+            dog_stats_api.increment(
+                'vscompat.deprecation',
+                tags=("location:xmodule_descriptor_translate")
+            )
         return cls.metadata_translations.get(key, key)
 
     # ================================= XML PARSING ============================

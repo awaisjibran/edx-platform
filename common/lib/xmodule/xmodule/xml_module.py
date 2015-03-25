@@ -203,8 +203,10 @@ class XmlDescriptor(XModuleDescriptor):
             definition_xml = copy.deepcopy(xml_object)
             filepath = ''
         else:
-            tags = [ "location:xmlparser_util_mixin_load_definition_filename" ]
-            dog_stats_api.increment('vscompat.deprecation', tags=tags)
+            dog_stats_api.increment(
+                'vscompat.deprecation',
+                tags=("location:xmlparser_util_mixin_load_definition_filename")
+            )
 
             filepath = cls._format_filepath(xml_object.tag, filename)
 
@@ -214,8 +216,10 @@ class XmlDescriptor(XModuleDescriptor):
             # again in the correct format.  This should go away once the CMS is
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
-                tags = [ "location:xmlparser_util_mixin_load_definition_backcompat" ]
-                dog_stats_api.increment('vscompat.deprecation', tags=tags)
+                dog_stats_api.increment(
+                    'vscompat.deprecation',
+                    tags=("location:xmlparser_util_mixin_load_definition_backcompat")
+                )
 
                 candidates = cls.backcompat_paths(filepath)
                 for candidate in candidates:
@@ -253,9 +257,13 @@ class XmlDescriptor(XModuleDescriptor):
 
             if attr in cls.metadata_to_strip:
                 if attr in ('course', 'org', 'url_name', 'filename'):
-                    tags = [ "location:xmlparser_util_mixin_load_metadata" ]
-                    tags.append("metadata:{}".format(attr))
-                    dog_stats_api.increment('vscompat.deprecation', tags=tags)
+                    dog_stats_api.increment(
+                        'vscompat.deprecation',
+                        tags=(
+                            "location:xmlparser_util_mixin_load_metadata",
+                            u"metadata:{}".format(attr)
+                        )
+                    )
                 # don't load these
                 continue
 
@@ -307,8 +315,10 @@ class XmlDescriptor(XModuleDescriptor):
         else:
             filepath = None
             definition_xml = xml_object
-            tags = [ "location:xmlparser_util_mixin_parse_xml" ]
-            dog_stats_api.increment('vscompat.deprecation', tags=tags)
+            dog_stats_api.increment(
+                'vscompat.deprecation',
+                tags=("location:xmlparser_util_mixin_parse_xml")
+            )
 
         definition, children = cls.load_definition(definition_xml, system, def_id, id_generator)  # note this removes metadata
 

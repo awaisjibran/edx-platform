@@ -267,9 +267,13 @@ class ItemFactory(XModuleFactory):
             # if we add one then we need to also add it to the policy information (i.e. metadata)
             # we should remove this once we can break this reference from the course to static tabs
             if category == 'static_tab':
-                tags = [ "action:{}".format(location.block_type) ]
-                tags.append("location:itemfactory_create_static_tab")
-                dog_stats_api.increment('vscompat.deprecation', tags=tags)
+                dog_stats_api.increment(
+                    'vscompat.deprecation',
+                    tags=(
+                        "block:{}".format(location.block_type),
+                        "location:itemfactory_create_static_tab"
+                    )
+                )
 
                 course = store.get_course(location.course_key)
                 course.tabs.append(

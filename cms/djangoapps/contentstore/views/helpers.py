@@ -253,9 +253,13 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
         # we should remove this once we can break this reference from the course to static tabs
         if category == 'static_tab':
 
-            tags = [ "action:{}".format(unicode(dest_usage_key.course_key)) ]
-            tags.append("location:create_xblock_static_tab")
-            dog_stats_api.increment('vscompat.deprecation', tags=tags)
+            dog_stats_api.increment(
+                'vscompat.deprecation',
+                tags=(
+                    "course:{}".format(unicode(dest_usage_key.course_key)),
+                    "location:create_xblock_static_tab"
+                )
+            )
 
             display_name = display_name or _("Empty")  # Prevent name being None
             course = store.get_course(dest_usage_key.course_key)

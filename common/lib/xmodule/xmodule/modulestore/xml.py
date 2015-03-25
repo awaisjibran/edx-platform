@@ -51,9 +51,13 @@ def clean_out_mako_templating(xml_string):
     xml_string = xml_string.replace('%include', 'include')
     xml_string = re.sub(r"(?m)^\s*%.*$", '', xml_string)
     if orig_xml != xml_string:
-        tags = [ "action:{}".format(orig_xml) ]
-        tags.append("location:xml_clean_out_mako_templating")
-        dog_stats_api.increment('vscompat.deprecation', tags=tags)
+        dog_stats_api.increment(
+            'vscompat.deprecation',
+            tags=(
+                "string:{}".format(orig_xml),
+                "location:xml_clean_out_mako_templating"
+            )
+        )
     return xml_string
 
 
@@ -120,9 +124,13 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 def fallback_name(orig_name=None):
                     """Return the fallback name for this module.  This is a function instead of a variable
                     because we want it to be lazy."""
-                    tags = [ "action:{}".format(orig_name) ]
-                    tags.append("location:import_system_fallback_name")
-                    dog_stats_api.increment('vscompat.deprecation', tags=tags)
+                    dog_stats_api.increment(
+                        'vscompat.deprecation',
+                        tags=(
+                            "name:{}".format(orig_name),
+                            "location:import_system_fallback_name"
+                        )
+                    )
 
                     if looks_like_fallback(orig_name):
                         # We're about to re-hash, in case something changed, so get rid of the tag_ and hash
@@ -479,9 +487,13 @@ class XMLModuleStore(ModuleStoreReadBase):
                 # VS[compat]: remove once courses use the policy dirs.
                 if policy == {}:
 
-                    tags = [ "action:{}".format(course) ]
-                    tags.append("location:xml_load_course_policy_dir")
-                    dog_stats_api.increment('vscompat.deprecation', tags=tags)
+                    dog_stats_api.increment(
+                        'vscompat.deprecation',
+                        tags=(
+                            "course:{}".format(course),
+                            "location:xml_load_course_policy_dir"
+                        )
+                    )
 
                     old_policy_path = self.data_dir / course_dir / 'policies' / '{0}.json'.format(url_name)
                     policy = self.load_policy(old_policy_path, tracker)
@@ -490,9 +502,13 @@ class XMLModuleStore(ModuleStoreReadBase):
                 # VS[compat] : 'name' is deprecated, but support it for now...
                 if course_data.get('name'):
 
-                    tags = [ "action:{}".format(course_data.get('name')) ]
-                    tags.append("location:xml_load_course_course_data_name")
-                    dog_stats_api.increment('vscompat.deprecation', tags=tags)
+                    dog_stats_api.increment(
+                        'vscompat.deprecation',
+                        tags=(
+                            "action:{}".format(course_data.get('name')),
+                            "location:xml_load_course_course_data_name"
+                        )
+                    )
 
                     url_name = Location.clean(course_data.get('name'))
                     tracker("'name' is deprecated for module xml.  Please use "
@@ -680,9 +696,13 @@ class XMLModuleStore(ModuleStoreReadBase):
                         # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
                         # from the course policy
                         if category == "static_tab":
-                            tags = [ "action:{}".format(course_dir) ]
-                            tags.append("location:xml_load_extra_content_static_tab")
-                            dog_stats_api.increment('vscompat.deprecation', tags=tags)
+                            dog_stats_api.increment(
+                                'vscompat.deprecation',
+                                tags=(
+                                    "course_dir:{}".format(course_dir),
+                                    "location:xml_load_extra_content_static_tab"
+                                )
+                            )
 
                             tab = CourseTabList.get_tab_by_slug(tab_list=course_descriptor.tabs, url_slug=slug)
                             if tab:

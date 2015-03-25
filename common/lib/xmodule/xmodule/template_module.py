@@ -43,8 +43,10 @@ class CustomTagDescriptor(RawDescriptor):
             template_name = xmltree.attrib['impl']
         else:
             # VS[compat]  backwards compatibility with old nested customtag structure
-            tags = [ "location:customtag_descriptor_render_template" ]
-            dog_stats_api.increment('vscompat.deprecation', tags=tags)
+            dog_stats_api.increment(
+                'vscompat.deprecation',
+                tags=("location:customtag_descriptor_render_template")
+            )
 
             child_impl = xmltree.find('impl')
             if child_impl is not None:

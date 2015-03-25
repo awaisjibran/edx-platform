@@ -105,8 +105,10 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
     @classmethod
     def backcompat_paths(cls, path):
 
-        tags = [ "location:html_descriptor_backcompat_paths" ]
-        dog_stats_api.increment('vscompat.deprecation', tags=tags)
+        dog_stats_api.increment(
+            'vscompat.deprecation',
+            tags=("location:html_descriptor_backcompat_paths",)
+        )
 
         if path.endswith('.html.xml'):
             path = path[:-9] + '.html'  # backcompat--look for html instead of xml
@@ -198,8 +200,10 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath):
 
-                tags = [ "location:html_descriptor_load_definition" ]
-                dog_stats_api.increment('vscompat.deprecation', tags=tags)
+                dog_stats_api.increment(
+                    'vscompat.deprecation',
+                    tags=("location:html_descriptor_load_definition",)
+                )
 
                 candidates = cls.backcompat_paths(filepath)
                 # log.debug("candidates = {0}".format(candidates))

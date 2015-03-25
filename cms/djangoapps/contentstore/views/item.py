@@ -639,9 +639,13 @@ def _delete_item(usage_key, user):
         # we should remove this once we can break this reference from the course to static tabs
         if usage_key.category == 'static_tab':
 
-            tags = [ "action:{}".format(unicode(dest_usage_key.course_key)) ]
-            tags.append("location:_delete_item_static_tab")
-            dog_stats_api.increment('vscompat.deprecation', tags=tags)
+            dog_stats_api.increment(
+                'vscompat.deprecation',
+                tags = (
+                    "course:{}".format(unicode(dest_usage_key.course_key)),
+                    "location:_delete_item_static_tab"
+                )
+            )
 
             course = store.get_course(usage_key.course_key)
             existing_tabs = course.tabs or []
