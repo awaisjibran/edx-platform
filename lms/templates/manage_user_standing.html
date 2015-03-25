@@ -3,23 +3,28 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 
-<h2>${_("Disable or Reenable student accounts")}</h2>
-<form action="${reverse('disable_account_ajax')}" method="post" data-remote="true" id="disable-form">
+<h2>${_("Manage student accounts")}</h2>
+<form action="${reverse('disable_account_ajax')}" method="post" data-remote="true" class="manage-accounts-form">
 	<label for="username">${_("Username:")}</label>
-	<input type="text" id="username" name="username" required="true">
+	<input type="text" id="username" name="username" required="true" tabindex="1">
 	<br>
-	<label for="account_action">${_("Disable Account")}</label>
-	<input type="radio" name="account_action" value="disable" id="account_action">
+	<label for="profile-image">${_("Profile Image:")}</label>
+    <img id="profile-image" tabindex="2">
 	<br>
-	<label for="account_action">${_("Reenable Account")}</label>
-	<input type="radio" name="account_action" value="reenable" id="account_action">
+	<label for="disable_action">${_("Disable Account")}</label>
+	<input type="radio" name="account_action" value="disable" id="disable_action" tabindex="3">
+	<br>
+	<label for="reenable_action">${_("Reenable Account")}</label>
+	<input type="radio" name="account_action" value="reenable" id="reenable_action" tabindex="4">
+	<br>
+	<label for="remove_profile_image_action">${_("Remove Profile Image")}</label>
+	<input type="radio" name="account_action" value="remove_profile_image" id="remove_profile_image_action" tabindex="5">
 	<br>
 	<br>
+    <button type="submit" tabindex="6">${_("Submit")}</button>
 </form>
 
-<button id="submit-form">${_("Submit")}</button>
-<br>
-<br>
+
 <p id="account-change-status"></p>
 <h2>${_("Students whose accounts have been disabled")}</h2>
 <p>${_("(reload your page to refresh)")}</p>
@@ -40,17 +45,50 @@
 
 <script type="text/javascript">
 	$(function() {
-		var form = $("#disable-form");
-		$("#submit-form").click(function(){
-			$("#account-change-status").text("${_('working')}");
-			$.ajax({
-				type: "POST",
-				url: form.attr('action'),
-				data: form.serialize(),
-				success: function(response){
-					$("#account-change-status").html(response.message);
-				},
-			});
+		var form = $(".manage-accounts-form"),
+            profileUrl = "${reverse('accounts_api', kwargs={'username': 'no-such-user'})}",
+            removeProfileUrl = "${reverse('profile_image_remove', kwargs={'username': 'no-such-user'})}",
+            refreshProfile;
+
+        refreshProfile = function(username) {
+            return $.ajax({
+                type: "GET",
+                url: profileUrl.replace('no-such-user', username),
+                success: function(response) {
+                    var imageUrl = response["profile_image"]["image_url_medium"];
+                    $("#profile-image", form).attr("src", imageUrl);
+                }
+            });
+        };
+
+		$(".manage-accounts-form").submit(function(event) {
+            event.preventDefault();
+            var username = $('#username', form).val(),
+                action = $("input:radio[name=account_action]:checked", form).val();
+            refreshProfile(username);
+            if (action === 'remove_profile_image') {
+    			$("#account-change-status").text("${_('working')}");
+                $.ajax({
+                    type: "POST",
+                    url: removeProfileUrl.replace('no-such-user', username),
+                    success: function(response) {
+                        refreshProfile(username).always(function() {
+                            $("#profile-image", form).focus();
+                            $("#account-change-status").html("");
+                        })
+                    }
+                });
+            } else if (action) {
+    			$("#account-change-status").text("${_('working')}");
+                $.ajax({
+                    type: "POST",
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    success: function(response) {
+                        $("#account-change-status").html(response.message);
+                    }
+                });
+            }
 		});
 	});
 </script>
