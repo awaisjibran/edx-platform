@@ -642,7 +642,7 @@ def _delete_item(usage_key, user):
             dog_stats_api.increment(
                 'vscompat.deprecation',
                 tags = (
-                    "course:{}".format(unicode(dest_usage_key.course_key)),
+                    "course:{}".format(unicode(usage_key.course_key)),
                     "location:_delete_item_static_tab"
                 )
             )
