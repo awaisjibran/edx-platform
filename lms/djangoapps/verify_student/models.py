@@ -891,7 +891,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
 
 class VerificationCheckpoint(models.Model):
-    """represents a point at which a user is challenged to reverify his or her identity.
+    """Represents a point at which a user is challenged to reverify his or her identity.
         Each checkpoint is uniquely identified by a (course_id, checkpoint_name) tuple.
     """
 
@@ -908,10 +908,27 @@ class VerificationCheckpoint(models.Model):
         unique_together = (('course_id', 'checkpoint_name'),)
 
     def add_verification_attempt(self, verification_attempt):
+        """ Add the verification attempt in M2M relation of photo_verification
+
+        Arguments:
+            verification_attempt(SoftwareSecurePhotoVerification): SoftwareSecurePhotoVerification object
+
+        Returns:
+            None
+        """
         self.photo_verification.add(verification_attempt)
 
     @classmethod
     def get_verification_checkpoint(cls, course_id, checkpoint_name):
+        """Get the verification checkpoint for given course_id and checkpoint name
+
+        Arguments:
+            course_id(CourseKey): CourseKey
+            checkpoint_name(str): checkpoint name
+
+        Returns:
+            VerificationCheckpoint object if exists otherwise None
+        """
         try:
             return cls.objects.get(course_id=course_id, checkpoint_name=checkpoint_name)
         except cls.DoesNotExist:
@@ -921,6 +938,8 @@ class VerificationCheckpoint(models.Model):
 class VerificationStatus(models.Model):
     """A verification status represents a user’s progress
     through the verification process for a particular checkpoint
+    Model is an append-only table that represents the user status changes in
+    verification process
     """
 
     VERIFICATION_STATUS_CHOICES = (
@@ -939,9 +958,27 @@ class VerificationStatus(models.Model):
 
     @classmethod
     def add_verification_status(cls, checkpoint, user, status):
+        """ Create new verification status object
+
+        Arguments:
+            checkpoint(VerificationCheckpoint): VerificationCheckpoint object
+            user(User): user object
+            status(str): String representing the status from VERIFICATION_STATUS_CHOICES
+        Returns:
+            None
+        """
         cls.objects.create(checkpoint=checkpoint, user=user, status=status)
 
     @classmethod
     def add_status_from_checkpoints(cls, checkpoints, user, status):
+        """ Create new verification status objects against the given checkpoints
+
+        Arguments:
+            checkpoints(list): list of VerificationCheckpoint objects
+            user(User): user object
+            status(str): String representing the status from VERIFICATION_STATUS_CHOICES
+        Returns:
+            None
+        """
         for checkpoint in checkpoints:
             cls.objects.create(checkpoint=checkpoint, user=user, status=status)

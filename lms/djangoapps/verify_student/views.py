@@ -47,7 +47,7 @@ from reverification.models import MidcourseReverificationWindow
 import ssencrypt
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import CourseKey
-from .exceptions import WindowExpiredException, VerificationCheckpointException
+from .exceptions import WindowExpiredException
 from xmodule.modulestore.django import modulestore
 from microsite_configuration import microsite
 
