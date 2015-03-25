@@ -386,6 +386,7 @@ class LazyFormat(object):
     def __getitem__(self, index):
         return unicode(self)[index]
 
+
 class CourseComparisonTest(BulkAssertionTest):
     """
     Mixin that has methods for comparing courses for equality.

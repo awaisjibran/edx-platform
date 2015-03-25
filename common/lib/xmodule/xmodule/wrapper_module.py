@@ -13,4 +13,3 @@ class WrapperBlock(VerticalBlock):
     ''' Layout block for laying out sub-blocks vertically w/o css delimiters'''
 
     has_children = True
-

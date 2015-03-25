@@ -1044,7 +1044,6 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
             ")".format(self)
         )
 
-
     # ~~~~~~~~~~~~~~~ XModule Indirection ~~~~~~~~~~~~~~~~
     @property
     def _xmodule(self):
