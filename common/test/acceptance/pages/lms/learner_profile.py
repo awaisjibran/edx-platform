@@ -53,7 +53,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         Check if a field with id set to `field_id` is shown.
 
-        Arguement:
+        Args:
             field_id (str): field id
 
         Returns:

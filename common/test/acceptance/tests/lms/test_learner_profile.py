@@ -133,7 +133,7 @@ class LearnerProfilePageTest(WebAppTest):
         And I reload the page.
         Then I should see the profile visibility selector dropdown.
         Then I see all the profile fields are shown.
-        And `location`, `language` and `aboutme` fields are editable.
+        And `location`, `language` and `about me` fields are editable.
         """
         self.visit_my_profile_page(self.MY_USER, privacy=self.PRIVACY_PUBLIC)
 
@@ -167,7 +167,7 @@ class LearnerProfilePageTest(WebAppTest):
         And I reload the page.
         Then I shouldn't see the profile visibility selector dropdown.
         Then I see all the profile fields are shown.
-        And `location`, `language` and `aboutme` fields are not editable.
+        And `location`, `language` and `about me` fields are not editable.
         """
         self.visit_other_profile_page(self.OTHER_USER, privacy=self.PRIVACY_PUBLIC)
         self.visit_other_profile_page(self.MY_USER)
@@ -175,8 +175,8 @@ class LearnerProfilePageTest(WebAppTest):
         self.assertFalse(self.other_profile_page.privacy_field_visible)
 
         # We are excluding language field from verification because when a usr view another users profile,
-        # server send `languages` field in model instead of `language`, due to which langauge field will not be shown
-        # Untill this is fixed on server side, we will exclude the language fields.
+        # server send `languages` field in model instead of `language`, due to which language field will not be shown
+        # Until this is fixed on server side, we will exclude the language fields.
         fields_to_check = self.PUBLIC_PROFILE_FIELDS[0:2] + self.PUBLIC_PROFILE_FIELDS[3:]
         self.assertEqual(self.other_profile_page.visible_fields, fields_to_check)
 

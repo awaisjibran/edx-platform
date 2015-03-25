@@ -82,7 +82,6 @@
                 })
             ];
 
-
             var learnerProfileView = new LearnerProfileView({
                 el: learnerProfileElement,
                 own_profile: options['own_profile'],

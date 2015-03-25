@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from util.testing import UrlResetMixin
-from openedx.core.djangoapps.user_api.api import account as account_api
+from openedx.core.djangoapps.user_api import api as account_api
 
 
 class LearnerProfileTest(UrlResetMixin, TestCase):
