@@ -36,9 +36,11 @@ checkpoint_name=checkpoint_name)}
 
 <div class="container">
   <section class="wrapper carousel">
-    ## Payment / Verification flow
-    ## Most of these data attributes are used to dynamically render
-    ## the steps, but some are just useful for A/B test setup.
+  ## Container for the reverification view.
+  ## The Backbone view renders itself into this <div>.
+  ## The server can pass information to the Backbone view
+  ## by including the information as "data-*" attributes
+  ## of this </div>.
     <div id="incourse-reverify-container"
     class="incourse-reverify"
     data-course-key='${course_key}'

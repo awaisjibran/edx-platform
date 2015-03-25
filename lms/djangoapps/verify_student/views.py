@@ -1133,7 +1133,7 @@ class InCourseReverifyView(View):
 
             VerificationStatus.add_verification_status(checkpoint, user, "submitted")
 
-            return HttpResponseRedirect(reverse('verify_student_incourse_reverification_confirmation'))
+            return HttpResponse(json.dumps("Completed!"), content_type="application/json")
         except Exception:
             log.exception(
                 "Could not submit verification attempt for user {}".format(request.user.id)

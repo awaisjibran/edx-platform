@@ -21,7 +21,7 @@
     return new edx.verify_student.InCourseReverifyView({
         courseKey: el.data('course-key'),
         checkpointName: el.data('checkpoint-name'),
-        errorModel: errorView.model,
+        errorModel: errorView.model
     }).render();
 
  })( jQuery, _ );
