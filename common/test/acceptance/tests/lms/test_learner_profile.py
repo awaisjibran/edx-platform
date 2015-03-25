@@ -15,10 +15,10 @@ class LearnerProfilePageTest(WebAppTest):
     Tests that verify Student's Profile Page.
     """
 
-    USER_ONE_NAME = 'user1'
-    USER_ONE_EMAIL = 'user1@edx.org'
-    USER_TWO_NAME = 'user2'
-    USER_TWO_EMAIL = 'user2@edx.org'
+    USER_1_NAME = 'user1'
+    USER_1_EMAIL = 'user1@edx.org'
+    USER_2_NAME = 'user2'
+    USER_2_EMAIL = 'user2@edx.org'
 
     MY_USER = 1
     OTHER_USER = 2
@@ -36,11 +36,16 @@ class LearnerProfilePageTest(WebAppTest):
         super(LearnerProfilePageTest, self).setUp()
         self.dashboard_page = DashboardPage(self.browser)
 
-        self.my_auto_auth_page = AutoAuthPage(self.browser, username=self.USER_ONE_NAME, email=self.USER_ONE_EMAIL).visit()
-        self.my_profile_page = LearnerProfilePage(self.browser, self.USER_ONE_NAME)
+        self.my_auto_auth_page = AutoAuthPage(self.browser, username=self.USER_1_NAME, email=self.USER_1_EMAIL).visit()
+        self.my_profile_page = LearnerProfilePage(self.browser, self.USER_1_NAME)
 
-        self.other_auto_auth_page = AutoAuthPage(self.browser, username=self.USER_TWO_NAME, email=self.USER_TWO_EMAIL).visit()
-        self.other_profile_page = LearnerProfilePage(self.browser, self.USER_TWO_NAME)
+        self.other_auto_auth_page = AutoAuthPage(
+            self.browser,
+            username=self.USER_2_NAME,
+            email=self.USER_2_EMAIL
+        ).visit()
+
+        self.other_profile_page = LearnerProfilePage(self.browser, self.USER_2_NAME)
 
     def authenticate_as_user(self, user):
         if user == self.MY_USER:
@@ -181,6 +186,9 @@ class LearnerProfilePageTest(WebAppTest):
         self.assertEqual(self.other_profile_page.visible_fields, fields_to_check)
 
     def _test_dropdown_field(self, field_id, new_value, displayed_value, mode):
+        """
+        Test behaviour of a dropdown field.
+        """
         self.visit_my_profile_page(self.MY_USER, privacy=self.PRIVACY_PUBLIC)
 
         self.my_profile_page.value_for_dropdown_field(field_id, new_value)
@@ -233,8 +241,8 @@ class LearnerProfilePageTest(WebAppTest):
         Test behaviour of `About Me` field.
         """
         placeholder_value = (
-            "Tell other edX learners a little about yourself, where you're from, "
-            "what your interests are, why you joined edX, what you hope to learn..."
+            "Tell other edX learners a little about yourself: where you live, what your interests are, "
+            "why you're taking courses on edX, or what you hope to learn."
         )
 
         self._test_textarea_field('bio', 'Eat Sleep Code', 'Eat Sleep Code', 'display')

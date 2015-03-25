@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from util.testing import UrlResetMixin
-from openedx.core.djangoapps.user_api import api as account_api
+from openedx.core.djangoapps.user_api.accounts import api as account_api
 
 
 class LearnerProfileTest(UrlResetMixin, TestCase):
@@ -34,4 +34,4 @@ class LearnerProfileTest(UrlResetMixin, TestCase):
         response = self.client.get(path=profile_path)
 
         self.assertTrue('href="{}"'.format(profile_path) in response.content)
-        self.assertTrue('class="learner-profile-container"' in response.content)
+        self.assertTrue('class="wrapper-profile"' in response.content)
