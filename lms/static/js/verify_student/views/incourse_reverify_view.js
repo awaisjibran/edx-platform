@@ -66,19 +66,27 @@
         },
 
         handleSubmitPhotoSuccess: function() {
-            // TODO: redirect back to a URL returned by the server.
             // Eventually this will be a redirect back into the courseware,
             // but for now we can return to the student dashboard.
             console.log('Submitted');
+            window.location.href = '/dashboard';
         },
 
-        handleSubmissionError: function() {
-            // TODO: use `this.errorModel` to display the error
-            // (see the webcam view for an example)
-            // TODO: Re-enable the submit button to allow the
-            // user to resubmit.
-            console.log('Error!');
-            this.setSubmitButtonEnabled(true)
+        handleSubmissionError: function(xhr) {
+            var errorMsg = gettext( 'An error has occurred. Please try again later.' );
+
+            // Re-enable the submit button to allow the user to retry
+            this.setSubmitButtonEnabled( true );
+
+            if ( xhr.status === 400 ) {
+                errorMsg = xhr.responseText;
+            }
+
+            this.errorModel.set({
+                errorTitle: gettext( 'Could not submit photos' ),
+                errorMsg: errorMsg,
+                shown: true
+            });
         },
         setSubmitButtonEnabled: function( isEnabled ) {
             $(this.submitButtonId)

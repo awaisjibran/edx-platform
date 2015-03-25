@@ -1137,8 +1137,5 @@ class InCourseReverifyView(View):
             log.exception(
                 "Could not submit verification attempt for user {}".format(request.user.id)
             )
-            context = {
-                "user_full_name": request.user.profile.name,
-                "error": True,
-            }
-            return render_to_response("verify_student/incourse_reverify.html", context)
+            msg = _("Could not submit photos")
+            return HttpResponseBadRequest(msg)
