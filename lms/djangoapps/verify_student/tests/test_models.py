@@ -652,20 +652,20 @@ class VerificationCheckpointTest(ModuleStoreTestCase):
 
         # Make an attempt and added to the checkpoint1.
         check_point1.add_verification_attempt(SoftwareSecurePhotoVerification.objects.create(user=self.user))
-        self.assertEqual(len(check_point1.photo_verification.all()), 1)
+        self.assertEqual(check_point1.photo_verification.count(), 1)
 
         # Make an other attempt and added to the checkpoint1.
         check_point1.add_verification_attempt(SoftwareSecurePhotoVerification.objects.create(user=self.user))
-        self.assertEqual(len(check_point1.photo_verification.all()), 2)
+        self.assertEqual(check_point1.photo_verification.count(), 2)
 
         # make new attempt and adding to the checkpoint2
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
         check_point2.add_verification_attempt(attempt)
-        self.assertEqual(len(check_point2.photo_verification.all()), 1)
+        self.assertEqual(check_point2.photo_verification.count(), 1)
 
         # remove the attempt from checkpoint2
         check_point2.photo_verification.remove(attempt)
-        self.assertEqual(len(check_point2.photo_verification.all()), 0)
+        self.assertEqual(check_point2.photo_verification.count(), 0)
 
 
 @ddt.ddt
@@ -702,7 +702,6 @@ class VerificationStatusTest(ModuleStoreTestCase):
 
         # getting the status from db.
         result = VerificationStatus.objects.filter(user=self.user)
-        self.assertEqual(len(result), 2)
+        self.assertEqual(len(result), len([self.check_point1.checkpoint_name, self.check_point2.checkpoint_name]))
         self.assertEqual(result[0].checkpoint.checkpoint_name, self.check_point1.checkpoint_name)
         self.assertEqual(result[1].checkpoint.checkpoint_name, self.check_point2.checkpoint_name)
-

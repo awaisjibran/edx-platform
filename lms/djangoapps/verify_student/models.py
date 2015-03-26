@@ -895,7 +895,7 @@ class VerificationCheckpoint(models.Model):
     )
 
     course_id = CourseKeyField(max_length=255, db_index=True)
-    checkpoint_name = models.CharField(unique=True, max_length=32, choices=CHECKPOINT_CHOICES)
+    checkpoint_name = models.CharField(max_length=32, choices=CHECKPOINT_CHOICES)
     photo_verification = models.ManyToManyField(SoftwareSecurePhotoVerification)
 
     class Meta:  # pylint: disable=missing-docstring, old-style-class
