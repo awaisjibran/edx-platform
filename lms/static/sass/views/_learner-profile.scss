@@ -10,13 +10,12 @@ $profile-photo-dimension: 120px;
 
 .ui-loading-indicator {
     @extend .ui-loading-base;
-
     padding-bottom: $baseline;
 
     // center horizontally
     @include margin-left(auto);
     @include margin-right(auto);
-    width: $baseline*5;
+    width: ($baseline*5);
 }
 
 .wrapper-profile {
@@ -69,7 +68,6 @@ $profile-photo-dimension: 120px;
 }
 
 .wrapper-profile-section-one {
-
     width: 100%;
     display: inline-block;
     margin-top: ($baseline*1.5);
@@ -84,7 +82,6 @@ $profile-photo-dimension: 120px;
 }
 
 .profile-section-one-fields {
-
     float: left;
     width: flex-grid(4, 12);
     @include margin-left($baseline*1.5);
@@ -100,9 +97,9 @@ $profile-photo-dimension: 120px;
         margin-bottom: ($baseline*0.75);
 
         .u-field-value {
-            font-size: 1.7em;
+            width: 400px;
             font-weight: 600;
-            line-height: 0.9em;
+            @extend %t-title4;
         }
     }
 
@@ -119,7 +116,7 @@ $profile-photo-dimension: 120px;
     }
 
     .u-field-message {
-        float: right;
+        @include float(right);
         width: 20px;
         margin-top: 2px;
     }
@@ -139,7 +136,7 @@ $profile-photo-dimension: 120px;
 
     .u-field-title {
         font-size: 1.1em;
-        font-weight: $font-bold;
+        @extend %t-weight4;
         margin-bottom: ($baseline/4);
     }
 
@@ -154,14 +151,14 @@ $profile-photo-dimension: 120px;
     }
 
     .u-field-message {
-        float: right;
+        @include float(right);
         width: auto;
         padding-top: ($baseline/4);
     }
 
     .u-field.mode-placeholder {
         padding: $baseline;
-        border: 1px dashed $base-font-color;
+        border: 2px dashed $gray-l3;
 
         .u-field-title {
             width: 100%;
@@ -175,9 +172,9 @@ $profile-photo-dimension: 120px;
     }
 
     .u-field.mode-placeholder:hover {
-        border: 1px dashed $m-blue-d1;
+        border: 2px dashed $link-color;
         .u-field-title {
-          color: $m-blue-d1;
+          color:  $link-color;
         }
     }
 }
