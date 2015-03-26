@@ -29,6 +29,8 @@ class LearnerProfilePageTest(WebAppTest):
     PUBLIC_PROFILE_FIELDS = ['username', 'country', 'language', 'bio']
     PRIVATE_PROFILE_FIELDS = ['username']
 
+    PUBLIC_PROFILE_EDITABLE_FIELDS = ['country', 'language', 'bio']
+
     def setUp(self):
         """
         Initialize pages.
@@ -53,6 +55,11 @@ class LearnerProfilePageTest(WebAppTest):
         elif user == self.OTHER_USER:
             self.other_auto_auth_page.visit()
 
+    def set_pubilc_profile_fields_data(self, profile_page):
+        profile_page.language('English')
+        profile_page.country('United Kingdom')
+        profile_page.aboutme('Nothing Special')
+
     def visit_my_profile_page(self, user, privacy=None):
         self.authenticate_as_user(user)
         self.my_profile_page.visit()
@@ -60,6 +67,9 @@ class LearnerProfilePageTest(WebAppTest):
 
         if user is self.MY_USER and privacy is not None:
             self.my_profile_page.privacy = privacy
+
+            if privacy == self.PRIVACY_PUBLIC:
+                self.set_pubilc_profile_fields_data(self.my_profile_page)
 
     def visit_other_profile_page(self, user, privacy=None):
         self.authenticate_as_user(user)
@@ -70,9 +80,7 @@ class LearnerProfilePageTest(WebAppTest):
             self.other_profile_page.privacy = privacy
 
             if privacy == self.PRIVACY_PUBLIC:
-                self.other_profile_page.language('English')
-                self.other_profile_page.country('United Kingdom')
-                self.other_profile_page.aboutme('Nothing Special')
+                self.set_pubilc_profile_fields_data(self.other_profile_page)
 
     def test_dashboard_learner_profile_link(self):
         """
@@ -90,24 +98,6 @@ class LearnerProfilePageTest(WebAppTest):
         self.assertTrue('My Profile' in self.dashboard_page.username_dropdown_link_text)
         self.dashboard_page.click_my_profile_link()
         self.my_profile_page.wait_for_page()
-
-    def _verify_profile_fields(self, visibility, own_profile=True):
-        """
-        Verify that desired fields are shown when profile visibility set to `visibility`
-
-        Arguments:
-            visibility (str): 'all_users' or 'private'
-        """
-        self.learner_profile_page.visibility = visibility
-
-        self.browser.refresh()
-        self.learner_profile_page.wait_for_page()
-
-        # Verify that fields are shown/hidden according to the profile visibility
-        self.assertTrue(self.learner_profile_page.fields_visibility(visibility))
-
-        # Verify that profile visibility selector is shown/hidden according to own_profile
-        self.assertEqual(self.learner_profile_page.visibility_selector_state, own_profile)
 
     def test_fields_on_my_private_profile(self):
         """
@@ -141,6 +131,8 @@ class LearnerProfilePageTest(WebAppTest):
 
         self.assertTrue(self.my_profile_page.privacy_field_visible)
         self.assertEqual(self.my_profile_page.visible_fields, self.PUBLIC_PROFILE_FIELDS)
+
+        self.assertEqual(self.my_profile_page.editable_fields, self.PUBLIC_PROFILE_EDITABLE_FIELDS)
 
     def test_fields_on_others_private_profile(self):
         """
@@ -181,6 +173,8 @@ class LearnerProfilePageTest(WebAppTest):
         # Until this is fixed on server side, we will exclude the language fields.
         fields_to_check = self.PUBLIC_PROFILE_FIELDS[0:2] + self.PUBLIC_PROFILE_FIELDS[3:]
         self.assertEqual(self.other_profile_page.visible_fields, fields_to_check)
+
+        self.assertEqual(self.my_profile_page.editable_fields, [])
 
     def _test_dropdown_field(self, field_id, new_value, displayed_value, mode):
         """
@@ -223,6 +217,8 @@ class LearnerProfilePageTest(WebAppTest):
         self.my_profile_page.make_field_editable('country')
         self.assertTrue(self.my_profile_page.mode_for_field('country'), 'edit')
 
+        self.assertTrue(self.my_profile_page.field_icon_present('country'))
+
     def test_language_field(self):
         """
         Test behaviour of `Language` field.
@@ -232,6 +228,8 @@ class LearnerProfilePageTest(WebAppTest):
 
         self.my_profile_page.make_field_editable('language')
         self.assertTrue(self.my_profile_page.mode_for_field('language'), 'edit')
+
+        self.assertTrue(self.my_profile_page.field_icon_present('language'))
 
     def test_aboutme_field(self):
         """

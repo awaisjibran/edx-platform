@@ -62,6 +62,24 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.wait_for_ajax()
         return self.q(css='.u-field-{}'.format(field_id)).visible
 
+    def field_is_editable(self, field_id):
+        """
+        Check if a field with id set to `field_id` is editable.
+
+        Args:
+            field_id (str): field id
+
+        Returns:
+            True/False
+        """
+        self.wait_for_ajax()
+        self.make_field_editable(field_id)
+        field_mode = self.mode_for_field(field_id)
+
+        if field_mode == 'edit':
+            return True
+        return False
+
     @property
     def visible_fields(self):
         """
@@ -72,6 +90,17 @@ class LearnerProfilePage(FieldsMixin, PageObject):
 
         fields = ['username', 'country', 'language', 'bio']
         return [field for field in fields if self.field_is_visible(field)]
+
+    @property
+    def editable_fields(self):
+        """
+        Return list of editable fields currently shown on page.
+        """
+        self.wait_for_ajax()
+        self.wait_for_element_visibility('.u-field-username', 'username is not visible')
+
+        fields = ['country', 'language', 'bio']
+        return [field for field in fields if self.field_is_editable(field)]
 
     @property
     def privacy_field_visible(self):
