@@ -13,17 +13,39 @@ from edxmako.shortcuts import render_to_response
 @login_required
 @require_http_methods(['GET'])
 def learner_profile(request, username):
-    """Render the students profile page.
+    """
+    Render the students profile page.
+
     Args:
         request (HttpRequest)
+        username (str): username of user whose profile is requested.
+
     Returns:
         HttpResponse: 200 if the page was sent successfully
         HttpResponse: 302 if not logged in (redirect to login page)
         HttpResponse: 405 if using an unsupported HTTP method
+
     Example usage:
         GET /account/profile
     """
+    return render_to_response(
+        'student_profile/learner_profile.html',
+        learner_profile_context(request.user.username, username, request.user.is_staff)
+    )
 
+
+def learner_profile_context(logged_in_username, profile_username, user_is_staff):
+    """
+    Context for the learner profile page.
+
+    Args:
+        logged_in_username (str): Username of user logged In user.
+        profile_username (str): username of user whose profile is requested.
+        user_is_staff (bool): Logged In user has staff access.
+
+    Returns:
+        dict
+    """
     language_options = [language for language in settings.ALL_LANGUAGES]
 
     country_options = [
@@ -36,13 +58,14 @@ def learner_profile(request, username):
     context = {
         'data': {
             'default_public_account_fields': settings.ACCOUNT_VISIBILITY_CONFIGURATION['public_fields'],
-            'accounts_api_url': reverse("accounts_api", kwargs={'username': username}),
-            'preferences_api_url': reverse('preferences_api', kwargs={'username': username}),
+            'accounts_api_url': reverse("accounts_api", kwargs={'username': profile_username}),
+            'preferences_api_url': reverse('preferences_api', kwargs={'username': profile_username}),
             'account_settings_page_url': reverse('account_settings'),
-            'has_preferences_access': (request.user.username == username or request.user.is_staff),
-            'own_profile': (request.user.username == username),
+            'has_preferences_access': (logged_in_username == profile_username or user_is_staff),
+            'own_profile': (logged_in_username == profile_username),
             'country_options': country_options,
             'language_options': language_options,
         }
     }
-    return render_to_response('student_profile/learner_profile.html', context)
+
+    return context

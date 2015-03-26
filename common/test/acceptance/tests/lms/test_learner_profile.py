@@ -50,17 +50,26 @@ class LearnerProfilePageTest(WebAppTest):
         self.other_profile_page = LearnerProfilePage(self.browser, self.USER_2_NAME)
 
     def authenticate_as_user(self, user):
+        """
+        Auto authenticate a user.
+        """
         if user == self.MY_USER:
             self.my_auto_auth_page.visit()
         elif user == self.OTHER_USER:
             self.other_auto_auth_page.visit()
 
     def set_pubilc_profile_fields_data(self, profile_page):
+        """
+        Fill in the public profile fields of a user.
+        """
         profile_page.language('English')
         profile_page.country('United Kingdom')
         profile_page.aboutme('Nothing Special')
 
     def visit_my_profile_page(self, user, privacy=None):
+        """
+        Visits a users profile page.
+        """
         self.authenticate_as_user(user)
         self.my_profile_page.visit()
         self.my_profile_page.wait_for_page()
@@ -72,6 +81,9 @@ class LearnerProfilePageTest(WebAppTest):
                 self.set_pubilc_profile_fields_data(self.my_profile_page)
 
     def visit_other_profile_page(self, user, privacy=None):
+        """
+        Visits a users profile page.
+        """
         self.authenticate_as_user(user)
         self.other_profile_page.visit()
         self.other_profile_page.wait_for_page()
@@ -182,14 +194,14 @@ class LearnerProfilePageTest(WebAppTest):
         """
         self.visit_my_profile_page(self.MY_USER, privacy=self.PRIVACY_PUBLIC)
 
-        self.my_profile_page.value_for_dropdown_field(field_id, new_value, expect_mode=mode)
-        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id, expect_mode=mode), displayed_value)
+        self.my_profile_page.value_for_dropdown_field(field_id, new_value)
+        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id), displayed_value)
         self.assertTrue(self.my_profile_page.mode_for_field(field_id), mode)
 
         self.browser.refresh()
         self.my_profile_page.wait_for_page()
 
-        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id, expect_mode=mode), displayed_value)
+        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id), displayed_value)
         self.assertTrue(self.my_profile_page.mode_for_field(field_id), mode)
 
     def _test_textarea_field(self, field_id, new_value, displayed_value, mode):
@@ -198,14 +210,14 @@ class LearnerProfilePageTest(WebAppTest):
         """
         self.visit_my_profile_page(self.MY_USER, privacy=self.PRIVACY_PUBLIC)
 
-        self.my_profile_page.value_for_textarea_field(field_id, expect_mode=mode, value=new_value)
-        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id, expect_mode=mode), displayed_value)
+        self.my_profile_page.value_for_textarea_field(field_id, new_value)
+        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id), displayed_value)
         self.assertTrue(self.my_profile_page.mode_for_field(field_id), mode)
 
         self.browser.refresh()
         self.my_profile_page.wait_for_page()
 
-        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id, expect_mode=mode), displayed_value)
+        self.assertEqual(self.my_profile_page.get_non_editable_mode_value(field_id), displayed_value)
         self.assertTrue(self.my_profile_page.mode_for_field(field_id), mode)
 
     def test_country_field(self):

@@ -4,6 +4,7 @@ Bok-Choy PageObject class for learner profile page.
 from . import BASE_URL
 from bok_choy.page_object import PageObject
 from .fields import FieldsMixin
+from bok_choy.promise import EmptyPromise
 
 
 PROFILE_VISIBILITY_SELECTOR = '#u-field-select-account_privacy option[value="{}"]'
@@ -46,8 +47,15 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         Set user profile privacy.
         """
-        self.q(css=PROFILE_VISIBILITY_SELECTOR.format(privacy)).first.click()
-        self.wait_for_ajax()
+        self.wait_for_element_visibility('select#u-field-select-account_privacy', 'Privacy dropdown is visiblie')
+
+        if privacy != self.privacy:
+            self.q(css=PROFILE_VISIBILITY_SELECTOR.format(privacy)).first.click()
+            EmptyPromise(lambda: privacy == self.privacy, 'Privacy is set to {}'.format(privacy)).fulfill()
+            self.wait_for_ajax()
+
+            if privacy == 'all_users':
+                self.wait_for_public_fields()
 
     def field_is_visible(self, field_id):
         """
@@ -74,11 +82,7 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         self.wait_for_ajax()
         self.make_field_editable(field_id)
-        field_mode = self.mode_for_field(field_id)
-
-        if field_mode == 'edit':
-            return True
-        return False
+        return self.mode_for_field(field_id) == 'edit'
 
     @property
     def visible_fields(self):
@@ -117,22 +121,27 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         Get or set language.
         """
-        return self.value_for_dropdown_field('country', value)
+        self.value_for_dropdown_field('country', value)
 
     def language(self, value=None):
         """
         Get or set country.
         """
-        return self.value_for_dropdown_field('language', value)
+        self.value_for_dropdown_field('language', value)
 
     def aboutme(self, value=None):
         """
         Get or set aboutme.
         """
-        return self.value_for_textarea_field('bio', value)
+        self.value_for_textarea_field('bio', value)
 
     def field_icon_present(self, field_id):
         """
         Check if an icon is present for a field. Please note only dropdown fields have icons.
         """
         return self.icon_for_field(field_id, FIELD_ICONS[field_id])
+
+    def wait_for_public_fields(self):
+        EmptyPromise(lambda: self.field_is_visible('country'), 'Country field is visible').fulfill()
+        EmptyPromise(lambda: self.field_is_visible('language'), 'Language field is visible').fulfill()
+        EmptyPromise(lambda: self.field_is_visible('bio'), 'About Me field is visible').fulfill()

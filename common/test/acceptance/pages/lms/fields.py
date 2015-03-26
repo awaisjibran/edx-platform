@@ -94,28 +94,6 @@ class FieldsMixin(object):
             "Indicator \"{0}\" is visible.".format(self.indicator_for_field(field_id))
         ).fulfill()
 
-    def mode_for_field(self, field_id):
-        """
-        Return the name of the current indicator in a field.
-        """
-        self.wait_for_ajax()
-
-        query = self.q(css='.u-field-{}'.format(field_id))
-        return [
-            class_name for class_name
-            in query.attrs('class')[0].split(' ')
-            if class_name.startswith('mode')
-        ][0].split('-')[1] if query.present else None
-
-    def wait_for_mode(self, field_id, mode):
-        """
-        Wait for an mode to appear in a field.
-        """
-        EmptyPromise(
-            lambda: mode == self.mode_for_field(field_id),
-            "mode is not changed.{0}".format(self.mode_for_field(field_id))
-        ).fulfill()
-
     def make_field_editable(self, field_id):
         """
         Make a field editable.
@@ -158,7 +136,7 @@ class FieldsMixin(object):
             query.results[0].send_keys(u'\ue007')  # Press Enter
         return query.attrs('value')[0]
 
-    def value_for_textarea_field(self, field_id, value=None, expect_mode=None):
+    def value_for_textarea_field(self, field_id, value=None):
         """
         Get or set the value of a textarea field.
         """
@@ -177,19 +155,17 @@ class FieldsMixin(object):
         if self.mode_for_field(field_id) == 'edit':
             return query.text[0]
         else:
-            return self.get_non_editable_mode_value(field_id, expect_mode)
+            return self.get_non_editable_mode_value(field_id)
 
-    def get_non_editable_mode_value(self, field_id, expect_mode=None):
+    def get_non_editable_mode_value(self, field_id):
         """
         Return value of field in `display` or `placeholder` mode.
         """
         self.wait_for_ajax()
-        if expect_mode:
-            self.wait_for_mode(field_id, expect_mode)
 
         return self.q(css='.u-field-{} .u-field-value'.format(field_id)).text[0]
 
-    def value_for_dropdown_field(self, field_id, value=None, expect_mode='display'):
+    def value_for_dropdown_field(self, field_id, value=None):
         """
         Get or set the value in a dropdown field.
         """
@@ -207,7 +183,7 @@ class FieldsMixin(object):
         if self.mode_for_field(field_id) == 'edit':
             return get_selected_option_text(query)
         else:
-            return self.get_non_editable_mode_value(field_id, expect_mode=expect_mode)
+            return self.get_non_editable_mode_value(field_id)
 
     def link_title_for_link_field(self, field_id):
         """

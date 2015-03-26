@@ -1,37 +1,69 @@
 # -*- coding: utf-8 -*-
 """ Tests for student profile views. """
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from util.testing import UrlResetMixin
-from openedx.core.djangoapps.user_api.accounts import api as account_api
+from student.tests.factories import UserFactory
+
+from student_profile.views import learner_profile_context
 
 
-class LearnerProfileTest(UrlResetMixin, TestCase):
-    """ Tests for the student profile views. """
+class LearnerProfileViewTest(UrlResetMixin, TestCase):
+    """ Tests for the student profile view. """
 
-    USERNAME = "sour_heart"
-    PASSWORD = u"forgotten"
-    EMAIL = u"sour_heart@useless.com"
+    USERNAME = "username"
+    PASSWORD = "password"
+    CONTEXT_DATA = [
+        'default_public_account_fields',
+        'accounts_api_url',
+        'preferences_api_url',
+        'account_settings_page_url',
+        'has_preferences_access',
+        'own_profile',
+        'country_options',
+        'language_options',
+    ]
 
     def setUp(self):
-        super(LearnerProfileTest, self).setUp()
+        super(LearnerProfileViewTest, self).setUp()
+        self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
+        self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
-        # Create/activate a new account
-        activation_key = account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        account_api.activate_account(activation_key)
-
-        # Login
-        result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.assertTrue(result)
-
-    def test_learner_profile_view(self):
+    def test_context(self):
         """
-        Verify that learner profile view is rendered with correct data.
+        Verify learner profile page context data.
+        """
+        context = learner_profile_context(self.user.username, self.USERNAME, self.user.is_staff)
+
+        self.assertEqual(
+            context['data']['default_public_account_fields'],
+            settings.ACCOUNT_VISIBILITY_CONFIGURATION['public_fields']
+        )
+
+        self.assertEqual(
+            context['data']['accounts_api_url'],
+            reverse("accounts_api", kwargs={'username': self.user.username})
+        )
+
+        self.assertEqual(
+            context['data']['preferences_api_url'],
+            reverse('preferences_api', kwargs={'username': self.user.username})
+        )
+
+        self.assertEqual(context['data']['account_settings_page_url'], reverse('account_settings'))
+
+        for attribute in self.CONTEXT_DATA:
+            self.assertIn(attribute, context['data'])
+
+    def test_view(self):
+        """
+        Verify learner profile page view.
         """
         profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
         response = self.client.get(path=profile_path)
 
-        self.assertTrue('href="{}"'.format(profile_path) in response.content)
-        self.assertTrue('class="wrapper-profile"' in response.content)
+        for attribute in self.CONTEXT_DATA:
+            self.assertIn(attribute, response.content)
